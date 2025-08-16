@@ -224,6 +224,13 @@ class BrowserOS {
         
         // Handle keyboard shortcuts
         document.addEventListener('keydown', (e) => {
+            // Skip if event is from input elements to avoid interference
+            if (e.target.tagName === 'INPUT' || 
+                e.target.tagName === 'TEXTAREA' || 
+                e.target.isContentEditable) {
+                return;
+            }
+            
             this.handleGlobalKeyboard(e);
         });
         
