@@ -1,0 +1,130 @@
+/* Desktop Styles */
+.desktop {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
+    position: relative;
+    overflow: hidden;
+}
+
+.desktop-content {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    right: 0;
+    bottom: 80px;
+    padding: 20px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 80px);
+    grid-gap: 20px;
+    align-content: start;
+    justify-content: start;
+}
+
+.desktop-icon {
+    width: 80px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.2s ease, backdrop-filter 0.2s ease;
+    padding: 10px 5px;
+    border-radius: 8px;
+    position: relative;
+}
+
+/* When dragged, icons use absolute positioning with transforms */
+.desktop-icon.dragged {
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: none !important;
+}
+
+.desktop-icon.dragging {
+    transition: none !important;
+    user-select: none;
+    pointer-events: none;
+    opacity: 0.8;
+    transform: scale(1.1);
+    z-index: 999 !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.desktop-content {
+    position: absolute;
+    top: 28px;
+    left: 0;
+    right: 0;
+    bottom: 80px;
+    padding: 20px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 80px);
+    grid-gap: 20px;
+    align-content: start;
+    justify-content: start;
+    /* Enable hardware acceleration for smoother scrolling */
+    transform: translateZ(0);
+    -webkit-overflow-scrolling: touch;
+}
+
+.desktop-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    transform: scale(1.05);
+}
+
+.desktop-icon.selected {
+    background: rgba(0, 122, 255, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.desktop-icon .icon {
+    font-size: 48px;
+    margin-bottom: 8px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    /* Optimize for animations */
+    will-change: transform;
+}
+
+.desktop-icon .label {
+    font-size: 12px;
+    color: white;
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+    font-weight: 500;
+    line-height: 1.2;
+    word-wrap: break-word;
+    max-width: 70px;
+    /* Optimize for animations */
+    will-change: transform;
+}
+
+/* Performance optimization for dragging */
+.desktop-icon {
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+/* Windows Container */
+.windows-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: 100;
+}
+
+.windows-container .window {
+    pointer-events: all;
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browser OS</title>
+    <link rel="stylesheet" href="src/styles/main.css">
+    <link rel="stylesheet" href="src/styles/desktop.css">
+    <link rel="stylesheet" href="src/styles/dock.css">
+    <link rel="stylesheet" href="src/styles/menubar.css">
+    <link rel="stylesheet" href="src/styles/widgets.css">
+</head>
+<body>
+    <!-- Desktop Background -->
+    <div id="desktop" class="desktop">
+        <!-- Menu Bar (Top) -->
+        <div id="menubar" class="menubar">
+            <div class="menubar-left">
+                <div class="apple-logo">🍎</div>
+                <div class="menu-item active">BrowserOS</div>
+            </div>
+            <div class="menubar-right">
+                <div class="menu-item" id="wifi-status">📶</div>
+                <div class="menu-item" id="battery-status">🔋 100%</div>
+                <div class="menu-item" id="datetime">Aug 16, 2025 12:00 PM</div>
+            </div>
+        </div>
+
+        <!-- Desktop Content Area -->
+        <div id="desktop-content" class="desktop-content">
+            <!-- Desktop icons will be added here -->
+            <div class="desktop-icon" data-app="finder">
+                <div class="icon">📁</div>
+                <div class="label">Finder</div>
+            </div>
+            <div class="desktop-icon" data-app="terminal">
+                <div class="icon">⚫</div>
+                <div class="label">Terminal</div>
+            </div>
+            <div class="desktop-icon" data-app="text-editor">
+                <div class="icon">📝</div>
+                <div class="label">TextEdit</div>
+            </div>
+        </div>
+
+        <!-- Application Windows Container -->
+        <div id="windows-container" class="windows-container">
+            <!-- Application windows will be rendered here -->
+        </div>
+
+        <!-- Dock (Bottom Center) -->
+        <div id="dock" class="dock">
+            <div class="dock-container">
+                <div class="dock-item" data-app="finder" title="Finder">
+                    <div class="dock-icon">📁</div>
+                    <div class="dock-indicator"></div>
+                </div>
+                <div class="dock-item" data-app="terminal" title="Terminal">
+                    <div class="dock-icon">⚫</div>
+                    <div class="dock-indicator"></div>
+                </div>
+                <div class="dock-item" data-app="text-editor" title="TextEdit">
+                    <div class="dock-icon">📝</div>
+                    <div class="dock-indicator"></div>
+                </div>
+                <div class="dock-item" data-app="calculator" title="Calculator">
+                    <div class="dock-icon">🧮</div>
+                    <div class="dock-indicator"></div>
+                </div>
+                <div class="dock-item" data-app="browser" title="Browser">
+                    <div class="dock-icon">🌐</div>
+                    <div class="dock-indicator"></div>
+                </div>
+                <div class="dock-item" data-app="settings" title="System Preferences">
+                    <div class="dock-icon">⚙️</div>
+                    <div class="dock-indicator"></div>
+                </div>
+                <div class="dock-separator"></div>
+                <div class="dock-item trash" data-app="trash" title="Trash">
+                    <div class="dock-icon">🗑️</div>
+                    <div class="dock-indicator"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="src/utilities/EventManager.js"></script>
+    <script src="src/utilities/EnvConfig.js"></script>
+    <script src="src/utilities/ErrorReporter.js"></script>
+    <script src="src/utilities/ConfigManager.js"></script>
+    <script src="src/utilities/WindowManager.js"></script>
+    <script src="src/utilities/SystemUtils.js"></script>
+    <script src="src/widgets/MenuBar.js"></script>
+    <script src="src/widgets/Dock.js"></script>
+    <script src="src/widgets/Desktop.js"></script>
+    <script src="src/applications/Finder.js"></script>
+    <script src="src/applications/Terminal.js"></script>
+    <script src="src/applications/TextEditor.js"></script>
+    <script src="src/applications/Calculator.js"></script>
+    <script src="src/applications/Browser.js"></script>
+    <script src="src/applications/Settings.js"></script>
+    <script src="src/main.js"></script>
+</body>
+</html>

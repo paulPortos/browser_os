@@ -1,0 +1,324 @@
+/* Root Variables for Theming */
+:root {
+    --bg-color: #ffffff;
+    --text-color: #000000;
+    --window-bg: rgba(255, 255, 255, 0.95);
+    --menubar-bg: rgba(240, 240, 240, 0.9);
+    --desktop-icon-size: 80px;
+    --border-radius: 12px;
+    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --desktop-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Dark Theme Variables */
+.dark-theme {
+    --bg-color: #1a1a1a;
+    --text-color: #ffffff;
+    --window-bg: rgba(30, 30, 30, 0.95);
+    --menubar-bg: rgba(40, 40, 40, 0.9);
+    --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    --desktop-bg: linear-gradient(135deg, #2d1b69 0%, #1a1a2e 100%);
+}
+
+/* Global Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    overflow: hidden;
+    height: 100vh;
+    background: var(--desktop-bg);
+    user-select: none;
+    color: var(--text-color);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Animation Classes */
+.fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease-in-out;
+}
+
+.scale-in {
+    animation: scaleIn 0.2s ease-out;
+}
+
+.scale-out {
+    animation: scaleOut 0.2s ease-in;
+}
+
+.bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+@keyframes scaleIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.8);
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+}
+
+@keyframes scaleOut {
+    from { 
+        opacity: 1; 
+        transform: scale(1);
+    }
+    to { 
+        opacity: 0; 
+        transform: scale(0.8);
+    }
+}
+
+@keyframes bounce {
+    0%, 20%, 53%, 80%, 100% {
+        transform: translateY(0);
+    }
+    40%, 43% {
+        transform: translateY(-8px);
+    }
+    70% {
+        transform: translateY(-4px);
+    }
+    90% {
+        transform: translateY(-2px);
+    }
+}
+
+/* Window Styles */
+.window {
+    position: absolute;
+    background: var(--window-bg);
+    backdrop-filter: blur(20px);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    min-width: 300px;
+    min-height: 200px;
+    overflow: hidden;
+    z-index: 100;
+    /* Remove the default resize to implement custom resize handles */
+    resize: none;
+    color: var(--text-color);
+}
+
+/* Resize handles */
+.window-resize-handle {
+    position: absolute;
+    background: transparent;
+}
+
+.window-resize-handle.n {
+    top: 0;
+    left: 8px;
+    right: 8px;
+    height: 4px;
+    cursor: n-resize;
+}
+
+.window-resize-handle.s {
+    bottom: 0;
+    left: 8px;
+    right: 8px;
+    height: 4px;
+    cursor: s-resize;
+}
+
+.window-resize-handle.e {
+    right: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 4px;
+    cursor: e-resize;
+}
+
+.window-resize-handle.w {
+    left: 0;
+    top: 8px;
+    bottom: 8px;
+    width: 4px;
+    cursor: w-resize;
+}
+
+.window-resize-handle.ne {
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: ne-resize;
+}
+
+.window-resize-handle.nw {
+    top: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: nw-resize;
+}
+
+.window-resize-handle.se {
+    bottom: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    cursor: se-resize;
+}
+
+.window-resize-handle.sw {
+    bottom: 0;
+    left: 0;
+    width: 8px;
+    height: 8px;
+    cursor: sw-resize;
+}
+
+.window.maximized {
+    top: 28px !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: calc(100vh - 108px) !important;
+    border-radius: 0;
+    resize: none;
+}
+
+.window.minimized {
+    transform: scale(0.1);
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease-in-out;
+}
+
+.window-header {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(240, 240, 240, 0.8) 100%);
+    height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    cursor: move;
+    position: relative;
+}
+
+.window-controls {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.window-control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.window-control.close {
+    background: #ff5f57;
+    color: #d13a32;
+}
+
+.window-control.minimize {
+    background: #ffbd2e;
+    color: #e5a820;
+}
+
+.window-control.maximize {
+    background: #28ca42;
+    color: #1dad2b;
+}
+
+.window-control:hover {
+    filter: brightness(0.9);
+    transform: scale(1.1);
+}
+
+.window-title {
+    flex: 1;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.8);
+    pointer-events: none;
+}
+
+.window-content {
+    height: calc(100% - 28px);
+    overflow: auto;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make window content responsive */
+.window-content > * {
+    flex: 1;
+    min-height: 0; /* Allow flex items to shrink below their content size */
+}
+
+/* Responsive layout for application content */
+.editor-window,
+.finder-window,
+.terminal-window,
+.calculator-window,
+.browser-window,
+.settings-window {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+/* Ensure textareas and content areas are responsive */
+textarea,
+.editor-content,
+.terminal-content,
+.finder-content {
+    flex: 1;
+    resize: none;
+    min-height: 0;
+}

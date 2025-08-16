@@ -1,0 +1,135 @@
+/* Dock Styles */
+.dock {
+    position: fixed;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.dock-container {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(30px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: end;
+    gap: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    pointer-events: all;
+}
+
+.dock-item {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: bottom;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.dock-item:hover {
+    transform: scale(1.4) translateY(-10px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.dock-item.bounce {
+    animation: bounce 0.6s ease-in-out;
+}
+
+.dock-icon {
+    font-size: 40px;
+    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dock-indicator {
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    margin-top: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.dock-item.active .dock-indicator {
+    opacity: 1;
+}
+
+.dock-separator {
+    width: 1px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.2);
+    margin: 0 4px;
+    align-self: center;
+}
+
+.dock-item.trash {
+    margin-left: 4px;
+}
+
+/* Dock hover effects for neighboring items */
+.dock-container:hover .dock-item:not(:hover) {
+    transform: scale(1.1);
+}
+
+.dock-container .dock-item:hover + .dock-item {
+    transform: scale(1.2) translateY(-5px);
+}
+
+.dock-container .dock-item:hover + .dock-item + .dock-item {
+    transform: scale(1.1) translateY(-2px);
+}
+
+.dock-item:has(+ .dock-item:hover) {
+    transform: scale(1.2) translateY(-5px);
+}
+
+.dock-item:has(+ .dock-item + .dock-item:hover) {
+    transform: scale(1.1) translateY(-2px);
+}
+
+/* Tooltip for dock items */
+.dock-item::before {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(-8px);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1001;
+}
+
+.dock-item:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-12px);
+}
+
+/* Magnification effect */
+@supports (backdrop-filter: blur()) {
+    .dock-container {
+        backdrop-filter: blur(30px) saturate(180%);
+    }
+}
