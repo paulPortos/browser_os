@@ -49,7 +49,30 @@ class SettingsApp {
         
         const content = `
             <div class="settings-container" style="height: 100%; display: flex; background: var(--bg-primary);">
-                <div class="settings-sidebar" style="width: 200px; background: var(--bg-secondary); border-right: 1px solid var(--border-color); padding: 16px;">
+                <div class="settings-sidebar" style="
+                    width: 200px; 
+                    background: var(--bg-secondary); 
+                    border-right: 2px solid var(--border-color); 
+                    padding: 16px;
+                    position: relative;
+                    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+                ">
+                    <!-- Enhanced separator line -->
+                    <div style="
+                        position: absolute;
+                        top: 0;
+                        right: -1px;
+                        width: 1px;
+                        height: 100%;
+                        background: linear-gradient(
+                            to bottom,
+                            transparent 0%,
+                            var(--border-color) 10%,
+                            var(--border-color) 90%,
+                            transparent 100%
+                        );
+                        box-shadow: 1px 0 3px rgba(0, 0, 0, 0.1);
+                    "></div>
                     <div style="font-weight: bold; margin-bottom: 16px; color: var(--text-primary);">System Preferences</div>
                     <div class="settings-nav-item active" data-section="general" style="padding: 8px; cursor: pointer; border-radius: 4px; margin-bottom: 4px; background: var(--accent-color); color: white;">General</div>
                     <div class="settings-nav-item" data-section="desktop" style="padding: 8px; cursor: pointer; border-radius: 4px; margin-bottom: 4px; color: var(--text-primary);">Desktop & Dock</div>
