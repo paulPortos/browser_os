@@ -21,6 +21,14 @@ class CalendarApp {
 
         // Listen for window resize events
         eventManager.on('window:resize', (data) => this.handleWindowResize(data));
+
+        // Listen for window closed events to clean up
+        eventManager.on('window:closed', (data) => {
+            if (this.windows.has(data.windowId)) {
+                this.closeWindow(data.windowId);
+                console.log(`📅 Calendar: Cleaned up window ${data.windowId}`);
+            }
+        });
     }
 
     /**
@@ -29,8 +37,15 @@ class CalendarApp {
     launch() {
         const existingWindow = Array.from(this.windows.keys())[0];
         if (existingWindow) {
-            windowManager.focusWindow(existingWindow);
-            return existingWindow;
+            // Check if the window actually exists in windowManager
+            if (windowManager.getWindow(existingWindow)) {
+                windowManager.focusWindow(existingWindow);
+                return existingWindow;
+            } else {
+                // Window doesn't exist anymore, clean it up
+                console.log(`📅 Calendar: Cleaning up stale window reference ${existingWindow}`);
+                this.windows.delete(existingWindow);
+            }
         }
 
         const windowId = windowManager.openWindow(
@@ -428,7 +443,11 @@ class CalendarApp {
         }
         
         // Add days of the month
-        const today = new Date();
+        // Use system-adjusted time if available, otherwise use actual time
+        const baseTime = Date.now();
+        const offset = window.systemTimeOffset || 0;
+        const today = new Date(baseTime + offset);
+        
         for (let day = 1; day <= daysInMonth; day++) {
             const dayDate = new Date(year, month, day);
             const isToday = dayDate.toDateString() === today.toDateString();
@@ -501,8 +520,13 @@ class CalendarApp {
      */
     goToToday(windowId) {
         const windowData = this.windows.get(windowId);
-        windowData.currentDate = new Date();
-        windowData.selectedDate = new Date();
+        // Use system-adjusted time if available
+        const baseTime = Date.now();
+        const offset = window.systemTimeOffset || 0;
+        const systemToday = new Date(baseTime + offset);
+        
+        windowData.currentDate = new Date(systemToday);
+        windowData.selectedDate = new Date(systemToday);
         this.updateCalendarDisplay(windowId);
     }
 
