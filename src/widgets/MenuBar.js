@@ -40,6 +40,33 @@ class MenuBar {
         }
     }
 
+    /**
+     * Revert menu bar title back to system name (used when all windows are closed)
+     */
+    revertToSystemName() {
+        if (window.configManager) {
+            const settings = window.configManager.getSettings();
+            const systemName = settings.systemName || 'BrowserOS';
+            this.updateSystemName(systemName);
+            console.log(`🔄 MenuBar: Reverted to system name: "${systemName}"`);
+        } else {
+            // Fallback to default if config manager not available
+            this.updateSystemName('BrowserOS');
+            console.log(`🔄 MenuBar: Reverted to default system name`);
+        }
+    }
+
+    /**
+     * Update the active app title in menu bar
+     */
+    updateActiveApp(appTitle) {
+        const systemNameElement = this.element.querySelector('.menu-item.active');
+        if (systemNameElement && appTitle) {
+            systemNameElement.textContent = appTitle;
+            console.log(`📱 MenuBar: Updated active app to "${appTitle}"`);
+        }
+    }
+
     setupEventListeners() {
         // Handle menu clicks
         this.element.addEventListener('click', (e) => {
@@ -65,6 +92,24 @@ class MenuBar {
             const windowData = windowManager.getWindow(data.windowId);
             if (windowData) {
                 this.updateActiveApp(windowData.title);
+            }
+        });
+
+        // Listen for window closed events to revert to system name if no windows are open
+        eventManager.on('window:closed', (data) => {
+            // Check if there are any remaining windows
+            if (windowManager.windows.size === 0) {
+                // No windows left, revert to system name
+                this.revertToSystemName();
+            } else {
+                // Find the currently focused window and update to its title
+                const activeWindow = windowManager.getActiveWindow();
+                if (activeWindow) {
+                    this.updateActiveApp(activeWindow.title);
+                } else {
+                    // If no active window, revert to system name
+                    this.revertToSystemName();
+                }
             }
         });
 
@@ -322,13 +367,6 @@ class MenuBar {
             this.element.querySelectorAll('.menu-item.active').forEach(item => {
                 item.classList.remove('active');
             });
-        }
-    }
-
-    updateActiveApp(appName) {
-        const activeMenuItem = this.element.querySelector('.menu-item.active');
-        if (activeMenuItem && !activeMenuItem.classList.contains('system-item')) {
-            activeMenuItem.textContent = appName;
         }
     }
 
