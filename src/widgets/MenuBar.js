@@ -67,6 +67,24 @@ class MenuBar {
         }
     }
 
+    /**
+     * Open the Calendar application when datetime is clicked
+     */
+    openCalendar() {
+        if (window.calendarApp) {
+            try {
+                const windowId = window.calendarApp.launch();
+                console.log(`📅 MenuBar: Opened Calendar application (Window ID: ${windowId})`);
+            } catch (error) {
+                console.error('❌ MenuBar: Failed to open Calendar:', error);
+                SystemUtils.showNotification('Error', 'Failed to open Calendar application', 3000);
+            }
+        } else {
+            console.error('❌ MenuBar: Calendar application not available');
+            SystemUtils.showNotification('Error', 'Calendar application not available', 3000);
+        }
+    }
+
     setupEventListeners() {
         // Handle menu clicks
         this.element.addEventListener('click', (e) => {
@@ -75,6 +93,29 @@ class MenuBar {
                 this.handleMenuClick(menuItem);
             }
         });
+
+        // Handle datetime click to open calendar
+        const datetimeElement = document.getElementById('datetime');
+        if (datetimeElement) {
+            datetimeElement.style.cursor = 'pointer';
+            datetimeElement.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.openCalendar();
+            });
+            
+            // Add hover effect
+            datetimeElement.addEventListener('mouseenter', () => {
+                datetimeElement.style.background = 'rgba(255, 255, 255, 0.1)';
+                datetimeElement.style.borderRadius = '6px';
+                datetimeElement.style.transform = 'scale(1.02)';
+                datetimeElement.style.transition = 'all 0.2s ease';
+            });
+            
+            datetimeElement.addEventListener('mouseleave', () => {
+                datetimeElement.style.background = 'transparent';
+                datetimeElement.style.transform = 'scale(1)';
+            });
+        }
 
         // Close menus when clicking outside
         document.addEventListener('click', (e) => {

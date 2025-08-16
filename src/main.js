@@ -152,6 +152,7 @@ class BrowserOS {
             'textEditorApp',
             'calculatorApp',
             'browserApp',
+            'calendarApp',
             'settingsApp'
         ];
         

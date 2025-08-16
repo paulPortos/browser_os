@@ -291,10 +291,14 @@ class SystemUtils {
     }
 
     static updateDateTime() {
-        const now = new Date();
+        // Use system time offset if set by Calendar app
+        const baseTime = Date.now();
+        const offset = window.systemTimeOffset || 0;
+        const adjustedTime = new Date(baseTime + offset);
+        
         const dateTimeElement = document.getElementById('datetime');
         if (dateTimeElement) {
-            dateTimeElement.textContent = SystemUtils.formatTime(now);
+            dateTimeElement.textContent = SystemUtils.formatTime(adjustedTime);
         }
     }
 

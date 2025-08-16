@@ -59,6 +59,7 @@ class Dock {
             { id: 'text-editor', title: 'TextEdit', icon: '📝' },
             { id: 'calculator', title: 'Calculator', icon: '🧮' },
             { id: 'browser', title: 'Browser', icon: '🌐' },
+            { id: 'calendar', title: 'Calendar', icon: '📅' },
             { id: 'settings', title: 'System Preferences', icon: '⚙️' },
             { id: 'trash', title: 'Trash', icon: '🗑️' }
         ];
