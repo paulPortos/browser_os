@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calculator Test</title>
+</head>
+<body>
+    <h1>Calculator Test</h1>
+    <button onclick="testCalculator()">Test Calculator</button>
+    <div id="result"></div>
+
+    <script src="src/utilities/EventManager.js"></script>
+    <script src="src/utilities/WindowManager.js"></script>
+    <script src="src/applications/Calculator.js"></script>
+    
+    <script>
+        function testCalculator() {
+            const result = document.getElementById('result');
+            
+            if (typeof window.calculatorApp === 'undefined') {
+                result.innerHTML = '<p style="color: red;">❌ calculatorApp not found</p>';
+                result.innerHTML += '<p>Available objects: ' + Object.keys(window).filter(k => k.includes('App')).join(', ') + '</p>';
+            } else {
+                result.innerHTML = '<p style="color: green;">✅ calculatorApp found</p>';
+                
+                try {
+                    window.calculatorApp.launch();
+                    result.innerHTML += '<p style="color: green;">✅ Calculator launched successfully</p>';
+                } catch (error) {
+                    result.innerHTML += '<p style="color: red;">❌ Error launching: ' + error.message + '</p>';
+                }
+            }
+        }
+        
+        // Test on load
+        window.addEventListener('load', () => {
+            setTimeout(testCalculator, 1000);
+        });
+    </script>
+</body>
+</html>

@@ -70,6 +70,7 @@ class WindowManager {
         // Create window element
         const windowElement = document.createElement('div');
         windowElement.id = windowId;
+        windowElement.setAttribute('data-window-id', windowId);
         windowElement.className = 'window fade-in';
         windowElement.style.cssText = `
             width: ${config.width}px;

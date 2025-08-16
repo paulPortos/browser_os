@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Standalone Calculator Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .calculator {
+            width: 400px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .display {
+            background: #000;
+            color: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            font-size: 24px;
+            text-align: right;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            padding: 20px;
+            font-size: 18px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .number {
+            background: #f0f0f0;
+        }
+        .operator {
+            background: #007bff;
+            color: white;
+        }
+        .equals {
+            background: #28a745;
+            color: white;
+        }
+        .clear {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h2>Simple Calculator Test</h2>
+        <div class="display" id="display">0</div>
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="clear" onclick="clearAll()">AC</button>
+            <button class="operator" onclick="inputOperation('/')">/</button>
+            <button class="operator" onclick="inputOperation('*')">*</button>
+            
+            <button class="number" onclick="inputNumber('7')">7</button>
+            <button class="number" onclick="inputNumber('8')">8</button>
+            <button class="number" onclick="inputNumber('9')">9</button>
+            <button class="operator" onclick="inputOperation('-')">-</button>
+            
+            <button class="number" onclick="inputNumber('4')">4</button>
+            <button class="number" onclick="inputNumber('5')">5</button>
+            <button class="number" onclick="inputNumber('6')">6</button>
+            <button class="operator" onclick="inputOperation('+')">+</button>
+            
+            <button class="number" onclick="inputNumber('1')">1</button>
+            <button class="number" onclick="inputNumber('2')">2</button>
+            <button class="number" onclick="inputNumber('3')">3</button>
+            <button class="equals" onclick="calculate()" rowspan="2">=</button>
+            
+            <button class="number" onclick="inputNumber('0')" style="grid-column: span 2;">0</button>
+            <button class="number" onclick="inputNumber('.')">.</button>
+        </div>
+    </div>
+
+    <script>
+        let display = '0';
+        let previousValue = null;
+        let operation = null;
+        let waitingForNewValue = false;
+
+        function updateDisplay() {
+            document.getElementById('display').textContent = display;
+        }
+
+        function inputNumber(number) {
+            console.log('inputNumber called with:', number);
+            if (waitingForNewValue) {
+                display = number;
+                waitingForNewValue = false;
+            } else {
+                display = display === '0' ? number : display + number;
+            }
+            updateDisplay();
+        }
+
+        function inputOperation(op) {
+            console.log('inputOperation called with:', op);
+            const inputValue = parseFloat(display);
+
+            if (previousValue === null) {
+                previousValue = inputValue;
+            } else if (operation) {
+                const result = performOperation(previousValue, inputValue, operation);
+                display = result.toString();
+                previousValue = result;
+                updateDisplay();
+            }
+
+            operation = op;
+            waitingForNewValue = true;
+        }
+
+        function calculate() {
+            console.log('calculate called');
+            if (operation && previousValue !== null) {
+                const currentValue = parseFloat(display);
+                const result = performOperation(previousValue, currentValue, operation);
+                display = result.toString();
+                previousValue = null;
+                operation = null;
+                waitingForNewValue = true;
+                updateDisplay();
+            }
+        }
+
+        function performOperation(prev, current, op) {
+            console.log('performOperation:', prev, op, current);
+            switch (op) {
+                case '+': return prev + current;
+                case '-': return prev - current;
+                case '*': return prev * current;
+                case '/': return current === 0 ? 0 : prev / current;
+                default: return current;
+            }
+        }
+
+        function clearDisplay() {
+            display = '0';
+            updateDisplay();
+        }
+
+        function clearAll() {
+            display = '0';
+            previousValue = null;
+            operation = null;
+            waitingForNewValue = false;
+            updateDisplay();
+        }
+    </script>
+</body>
+</html>
