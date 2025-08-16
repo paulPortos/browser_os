@@ -84,7 +84,7 @@ class CalendarApp {
      */
     createCalendarContent() {
         return `
-            <div class="calendar-container" style="height: 100%; display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, sans-serif;">
+            <div class="calendar-container" style="height: 100%; display: flex; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, sans-serif; position: relative; overflow: hidden;">
                 <!-- Calendar Header -->
                 <div class="calendar-header" style="
                     display: flex; 
@@ -94,33 +94,7 @@ class CalendarApp {
                     background: var(--bg-secondary);
                     border-bottom: 1px solid var(--border-color);
                 ">
-                    <div class="calendar-navigation" style="display: flex; align-items: center; gap: 8px;">
-                        <button class="nav-button" data-action="prev-month" style="
-                            background: var(--accent-color);
-                            color: white;
-                            border: none;
-                            border-radius: 6px;
-                            width: 32px;
-                            height: 32px;
-                            cursor: pointer;
-                            font-size: 16px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">‹</button>
-                        <button class="nav-button" data-action="next-month" style="
-                            background: var(--accent-color);
-                            color: white;
-                            border: none;
-                            border-radius: 6px;
-                            width: 32px;
-                            height: 32px;
-                            cursor: pointer;
-                            font-size: 16px;
-                            display: flex;
-                            align-items: center;
-                            justify-content: center;
-                        ">›</button>
+                    <div class="calendar-navigation" style="display: flex; align-items: center; gap: 8px; width: 100px;">
                         <button class="nav-button" data-action="today" style="
                             background: var(--bg-primary);
                             color: var(--text-primary);
@@ -139,38 +113,25 @@ class CalendarApp {
                         color: var(--text-primary);
                         text-align: center;
                         flex: 1;
-                    ">
-                        <span class="current-month-year">December 2024</span>
+                        cursor: pointer;
+                        padding: 8px;
+                        border-radius: 6px;
+                        transition: background 0.2s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    " data-action="show-month-year-picker" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
+                        <span class="current-month-year" style="pointer-events: none;">December 2024</span>
                     </div>
                     
-                    <div class="view-selector" style="display: flex; gap: 4px;">
-                        <button class="view-button active" data-view="month" style="
-                            background: var(--accent-color);
-                            color: white;
-                            border: none;
-                            border-radius: 4px;
-                            padding: 6px 12px;
-                            cursor: pointer;
-                            font-size: 12px;
-                            font-weight: 500;
-                        ">Month</button>
-                        <button class="view-button" data-view="week" style="
-                            background: var(--bg-primary);
-                            color: var(--text-primary);
-                            border: 1px solid var(--border-color);
-                            border-radius: 4px;
-                            padding: 6px 12px;
-                            cursor: pointer;
-                            font-size: 12px;
-                            font-weight: 500;
-                        ">Week</button>
-                    </div>
+                    <!-- Placeholder for balance -->
+                    <div style="width: 100px;"></div>
                 </div>
 
                 <!-- Calendar Content -->
-                <div class="calendar-content" style="flex: 1; padding: 16px; overflow: auto;">
+                <div class="calendar-content" style="flex: 1; padding: 16px; overflow: hidden; display: flex; flex-direction: column;">
                     <!-- Month View -->
-                    <div class="month-view" style="height: 100%;">
+                    <div class="month-view" style="height: 100%; display: flex; flex-direction: column; overflow: hidden;">
                         <!-- Days of week header -->
                         <div class="weekdays-header" style="
                             display: grid;
@@ -183,8 +144,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Sun</div>
                             <div class="weekday" style="
@@ -192,8 +153,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Mon</div>
                             <div class="weekday" style="
@@ -201,8 +162,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Tue</div>
                             <div class="weekday" style="
@@ -210,8 +171,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Wed</div>
                             <div class="weekday" style="
@@ -219,8 +180,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Thu</div>
                             <div class="weekday" style="
@@ -228,8 +189,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Fri</div>
                             <div class="weekday" style="
@@ -237,8 +198,8 @@ class CalendarApp {
                                 text-align: center;
                                 font-weight: 600;
                                 font-size: 12px;
-                                color: var(--text-secondary);
-                                background: var(--bg-secondary);
+                                color: #666666;
+                                background: #f8f9fa;
                                 border-radius: 4px;
                             ">Sat</div>
                         </div>
@@ -249,7 +210,8 @@ class CalendarApp {
                             grid-template-columns: repeat(7, 1fr);
                             grid-template-rows: repeat(6, 1fr);
                             gap: 2px;
-                            height: calc(100% - 60px);
+                            flex: 1;
+                            overflow: hidden;
                         ">
                             <!-- Calendar days will be generated here -->
                         </div>
@@ -258,24 +220,28 @@ class CalendarApp {
 
                 <!-- Date Editor Modal (hidden by default) -->
                 <div class="date-editor-modal" style="
-                    position: fixed;
+                    position: absolute;
                     top: 0;
                     left: 0;
                     width: 100%;
                     height: 100%;
-                    background: rgba(0, 0, 0, 0.5);
+                    background: rgba(0, 0, 0, 0.8);
                     display: none;
                     z-index: 1000;
                     align-items: center;
                     justify-content: center;
                 ">
                     <div class="date-editor-content" style="
-                        background: var(--bg-primary);
+                        background: #ffffff !important;
                         border-radius: 12px;
                         padding: 24px;
                         width: 400px;
-                        border: 1px solid var(--border-color);
-                        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+                        border: 2px solid #cccccc;
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                        backdrop-filter: none;
+                        opacity: 1 !important;
+                        position: relative;
+                        z-index: 1001;
                     ">
                         <h3 style="margin: 0 0 16px 0; color: var(--text-primary);">Set System Date</h3>
                         <div style="margin-bottom: 16px;">
@@ -325,6 +291,122 @@ class CalendarApp {
                         </div>
                     </div>
                 </div>
+
+                <!-- Month/Year Picker Modal (hidden by default) -->
+                <div class="month-year-picker-modal" style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.8);
+                    display: none;
+                    z-index: 1000;
+                    align-items: center;
+                    justify-content: center;
+                ">
+                    <div class="month-year-picker-content" style="
+                        background: #ffffff !important;
+                        border-radius: 12px;
+                        padding: 24px;
+                        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+                        border: 2px solid #cccccc;
+                        min-width: 300px;
+                        max-width: 400px;
+                        backdrop-filter: none;
+                        opacity: 1 !important;
+                        position: relative;
+                        z-index: 1001;
+                    ">
+                        <h3 style="
+                            margin: 0 0 20px 0;
+                            font-size: 18px;
+                            color: #333333;
+                            text-align: center;
+                        ">Select Month & Year</h3>
+                        
+                        <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                            <!-- Month Selector -->
+                            <div style="flex: 1;">
+                                <label style="
+                                    display: block;
+                                    margin-bottom: 8px;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    color: #333333;
+                                ">Month</label>
+                                <select class="month-selector" style="
+                                    width: 100%;
+                                    padding: 8px;
+                                    border: 1px solid #cccccc;
+                                    border-radius: 6px;
+                                    background: #ffffff;
+                                    color: #333333;
+                                    font-size: 14px;
+                                ">
+                                    <option value="0">January</option>
+                                    <option value="1">February</option>
+                                    <option value="2">March</option>
+                                    <option value="3">April</option>
+                                    <option value="4">May</option>
+                                    <option value="5">June</option>
+                                    <option value="6">July</option>
+                                    <option value="7">August</option>
+                                    <option value="8">September</option>
+                                    <option value="9">October</option>
+                                    <option value="10">November</option>
+                                    <option value="11">December</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Year Selector -->
+                            <div style="flex: 1;">
+                                <label style="
+                                    display: block;
+                                    margin-bottom: 8px;
+                                    font-size: 14px;
+                                    font-weight: 500;
+                                    color: #333333;
+                                ">Year</label>
+                                <select class="year-selector" style="
+                                    width: 100%;
+                                    padding: 8px;
+                                    border: 1px solid #cccccc;
+                                    border-radius: 6px;
+                                    background: #ffffff;
+                                    color: #333333;
+                                    font-size: 14px;
+                                    max-height: 120px;
+                                    overflow-y: auto;
+                                ">
+                                    <!-- Years will be populated dynamically -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button class="cancel-month-year-picker" style="
+                                padding: 8px 16px;
+                                border: 1px solid #cccccc;
+                                border-radius: 6px;
+                                background: #f5f5f5;
+                                color: #333333;
+                                cursor: pointer;
+                                font-size: 14px;
+                            ">Cancel</button>
+                            <button class="apply-month-year-picker" style="
+                                padding: 8px 16px;
+                                border: none;
+                                border-radius: 6px;
+                                background: #007bff;
+                                color: white;
+                                cursor: pointer;
+                                font-size: 14px;
+                                font-weight: 500;
+                            ">Select</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -340,22 +422,13 @@ class CalendarApp {
             const action = e.target.dataset.action;
             if (action) {
                 switch (action) {
-                    case 'prev-month':
-                        this.navigateMonth(windowId, -1);
-                        break;
-                    case 'next-month':
-                        this.navigateMonth(windowId, 1);
-                        break;
                     case 'today':
                         this.goToToday(windowId);
                         break;
+                    case 'show-month-year-picker':
+                        this.showMonthYearPicker(windowId);
+                        break;
                 }
-            }
-            
-            // View buttons
-            const view = e.target.dataset.view;
-            if (view) {
-                this.changeView(windowId, view);
             }
             
             // Calendar day clicks
@@ -375,6 +448,15 @@ class CalendarApp {
             if (e.target.classList.contains('apply-date-edit')) {
                 this.applyDateEdit(windowId);
             }
+            
+            // Month/Year Picker buttons
+            if (e.target.classList.contains('cancel-month-year-picker')) {
+                this.hideMonthYearPicker(windowId);
+            }
+            
+            if (e.target.classList.contains('apply-month-year-picker')) {
+                this.applyMonthYearPicker(windowId);
+            }
         });
 
         // Close modal when clicking outside
@@ -382,6 +464,14 @@ class CalendarApp {
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
                 this.hideDateEditor(windowId);
+            }
+        });
+        
+        // Close month/year picker modal when clicking outside
+        const monthYearModal = windowElement.querySelector('.month-year-picker-modal');
+        monthYearModal.addEventListener('click', (e) => {
+            if (e.target === monthYearModal) {
+                this.hideMonthYearPicker(windowId);
             }
         });
     }
@@ -429,15 +519,18 @@ class CalendarApp {
             const emptyDay = document.createElement('div');
             emptyDay.className = 'calendar-day empty';
             emptyDay.style.cssText = `
-                border: 1px solid var(--border-color);
+                border: 1px solid #f0f0f0;
                 border-radius: 6px;
-                background: var(--bg-tertiary);
+                background: #fafafa;
                 display: flex;
                 flex-direction: column;
                 padding: 8px;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                min-height: 60px;
+                min-height: 0;
+                height: 100%;
+                opacity: 0.5;
+                overflow: hidden;
             `;
             grid.appendChild(emptyDay);
         }
@@ -457,24 +550,28 @@ class CalendarApp {
             dayElement.className = 'calendar-day';
             dayElement.dataset.date = dayDate.toISOString();
             dayElement.style.cssText = `
-                border: 1px solid var(--border-color);
+                border: 1px solid #e0e0e0;
                 border-radius: 6px;
-                background: var(--bg-primary);
+                background: #ffffff;
+                color: #333333;
                 display: flex;
                 flex-direction: column;
                 padding: 8px;
                 cursor: pointer;
                 transition: all 0.2s ease;
-                min-height: 60px;
+                min-height: 0;
+                height: 100%;
                 position: relative;
+                overflow: hidden;
                 ${isToday ? `
-                    border: 2px solid var(--accent-color);
-                    background: rgba(0, 122, 255, 0.1);
+                    border: 2px solid #007bff;
+                    background: #e3f2fd;
+                    color: #1976d2;
                 ` : ''}
                 ${isSelected ? `
-                    background: rgba(0, 122, 255, 0.2);
-                    border: 2px solid var(--accent-color);
-                    color: var(--text-primary);
+                    background: #bbdefb;
+                    border: 2px solid #007bff;
+                    color: #1976d2;
                 ` : ''}
             `;
             
@@ -483,21 +580,24 @@ class CalendarApp {
                     font-weight: ${isToday ? 'bold' : '500'};
                     font-size: 14px;
                     margin-bottom: 4px;
+                    color: ${isToday || isSelected ? '#1976d2' : '#333333'};
                 ">${day}</div>
-                ${isToday ? '<div class="day-indicator" style="font-size: 10px; color: var(--accent-color); font-weight: bold;">TODAY</div>' : ''}
+                ${isToday ? '<div class="day-indicator" style="font-size: 10px; color: #1976d2; font-weight: bold;">TODAY</div>' : ''}
             `;
             
             // Add hover effect
             dayElement.addEventListener('mouseenter', () => {
                 if (!isSelected) {
-                    dayElement.style.background = 'var(--bg-secondary)';
+                    dayElement.style.background = '#f5f5f5';
+                    dayElement.style.color = '#333333';
                     dayElement.style.transform = 'scale(1.02)';
                 }
             });
             
             dayElement.addEventListener('mouseleave', () => {
                 if (!isSelected) {
-                    dayElement.style.background = 'var(--bg-primary)';
+                    dayElement.style.background = '#ffffff';
+                    dayElement.style.color = '#333333';
                     dayElement.style.transform = 'scale(1)';
                 }
             });
@@ -577,6 +677,10 @@ class CalendarApp {
      * Show options for selected date
      */
     showDateOptions(windowId, date) {
+        const windowElement = windowManager.getWindow(windowId).element;
+        const modal = windowElement.querySelector('.date-editor-modal');
+        const modalContent = modal.querySelector('.date-editor-content');
+        
         const dateStr = date.toLocaleDateString('en-US', {
             weekday: 'long',
             year: 'numeric',
@@ -584,23 +688,48 @@ class CalendarApp {
             day: 'numeric'
         });
         
-        SystemUtils.showModal(
-            'Date Options',
-            `
-                <div style="text-align: center; margin: 20px 0;">
-                    <h3 style="color: var(--text-primary); margin-bottom: 16px;">${dateStr}</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">What would you like to do with this date?</p>
-                </div>
-            `,
-            [
-                { text: 'Set as System Date', value: 'set-system', primary: true },
-                { text: 'Cancel', value: 'cancel' }
-            ]
-        ).then(result => {
-            if (result === 'set-system') {
-                this.setSystemDate(windowId, date);
-            }
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: #333333; margin-bottom: 16px; font-size: 18px;">${dateStr}</h3>
+                <p style="color: #666666; margin-bottom: 0;">What would you like to do with this date?</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="set-system-date-btn" style="
+                    background: #007bff;
+                    color: white;
+                    border: none;
+                    border-radius: 8px;
+                    padding: 12px 24px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 14px;
+                ">Set as System Date</button>
+                
+                <button class="cancel-btn" style="
+                    background: #f5f5f5;
+                    color: #333333;
+                    border: 1px solid #cccccc;
+                    border-radius: 8px;
+                    padding: 12px 24px;
+                    cursor: pointer;
+                    font-weight: 500;
+                    font-size: 14px;
+                ">Cancel</button>
+            </div>
+        `;
+        
+        // Add event listeners for the buttons
+        modalContent.querySelector('.set-system-date-btn').addEventListener('click', () => {
+            this.setSystemDate(windowId, date);
+            modal.style.display = 'none';
         });
+        
+        modalContent.querySelector('.cancel-btn').addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        
+        modal.style.display = 'flex';
     }
 
     /**
@@ -644,6 +773,65 @@ class CalendarApp {
             this.setSystemDate(windowId, newDate);
             this.hideDateEditor(windowId);
         }
+    }
+
+    /**
+     * Show month/year picker modal
+     */
+    showMonthYearPicker(windowId) {
+        const windowElement = windowManager.getWindow(windowId).element;
+        const modal = windowElement.querySelector('.month-year-picker-modal');
+        const monthSelector = windowElement.querySelector('.month-selector');
+        const yearSelector = windowElement.querySelector('.year-selector');
+        const windowData = this.windows.get(windowId);
+        
+        // Populate year options (current year ± 50 years)
+        const currentYear = new Date().getFullYear();
+        const years = [];
+        for (let year = currentYear - 50; year <= currentYear + 50; year++) {
+            years.push(year);
+        }
+        
+        yearSelector.innerHTML = years.map(year => 
+            `<option value="${year}">${year}</option>`
+        ).join('');
+        
+        // Set current month and year
+        monthSelector.value = windowData.currentDate.getMonth();
+        yearSelector.value = windowData.currentDate.getFullYear();
+        
+        modal.style.display = 'flex';
+    }
+
+    /**
+     * Hide month/year picker modal
+     */
+    hideMonthYearPicker(windowId) {
+        const windowElement = windowManager.getWindow(windowId).element;
+        const modal = windowElement.querySelector('.month-year-picker-modal');
+        modal.style.display = 'none';
+    }
+
+    /**
+     * Apply month/year picker selection
+     */
+    applyMonthYearPicker(windowId) {
+        const windowElement = windowManager.getWindow(windowId).element;
+        const monthSelector = windowElement.querySelector('.month-selector');
+        const yearSelector = windowElement.querySelector('.year-selector');
+        const windowData = this.windows.get(windowId);
+        
+        const selectedMonth = parseInt(monthSelector.value);
+        const selectedYear = parseInt(yearSelector.value);
+        
+        // Update the current date
+        windowData.currentDate = new Date(selectedYear, selectedMonth, 1);
+        
+        // Update the display
+        this.updateCalendarDisplay(windowId);
+        
+        // Hide the modal
+        this.hideMonthYearPicker(windowId);
     }
 
     /**
