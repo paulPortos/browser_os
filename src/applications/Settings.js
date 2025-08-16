@@ -107,7 +107,21 @@ class SettingsApp {
                         <div style="margin-bottom: 16px;">
                             <button id="test-error-reporting" style="padding: 8px 16px; background: #FF9500; color: white; border: none; border-radius: 4px; cursor: pointer;">Test Error Reporting</button>
                         </div>
-                        <button id="apply-settings" style="padding: 10px 20px; background: var(--accent-color); color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px;">Apply Settings</button>
+                        <button id="apply-settings" style="
+                            padding: 12px 24px; 
+                            background: linear-gradient(135deg, #34C759, #28A745); 
+                            color: white; 
+                            border: none; 
+                            border-radius: 8px; 
+                            cursor: pointer; 
+                            margin-top: 20px;
+                            font-weight: 600;
+                            font-size: 14px;
+                            box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3);
+                            transition: all 0.2s ease;
+                            position: relative;
+                            overflow: hidden;
+                        " onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 6px 16px rgba(52, 199, 89, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(52, 199, 89, 0.3)'">✅ Apply Settings</button>
                         <button id="reset-settings" style="padding: 10px 20px; background: #dc3545; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 20px; margin-left: 10px;">Reset to Defaults</button>
                     </div>
                     <div class="settings-section hidden" data-section="desktop" style="display: none;">
@@ -268,7 +282,30 @@ class SettingsApp {
         // Apply theme
         window.configManager.applyTheme(newSettings.theme);
         
+        // Update system name in menu bar
+        if (newSettings.systemName) {
+            this.updateSystemNameInMenuBar(newSettings.systemName);
+        }
+        
         this.showNotification('Settings applied successfully');
+    }
+
+    /**
+     * Update system name in the menu bar
+     */
+    updateSystemNameInMenuBar(systemName) {
+        const menuBarSystemName = document.querySelector('.menubar .menu-item.active');
+        if (menuBarSystemName) {
+            menuBarSystemName.textContent = systemName;
+            console.log(`✅ Updated system name in menu bar to: ${systemName}`);
+        } else {
+            console.warn('⚠️ Could not find menu bar system name element');
+        }
+        
+        // Also emit an event for other components that might need to know
+        if (window.eventManager) {
+            eventManager.emit('system:nameChanged', { systemName });
+        }
     }
 
     /**

@@ -12,6 +12,32 @@ class MenuBar {
     init() {
         this.setupEventListeners();
         this.updateSystemStatus();
+        this.initializeSystemName();
+    }
+
+    initializeSystemName() {
+        // Initialize system name from config when available
+        if (window.configManager) {
+            const settings = window.configManager.getSettings();
+            if (settings && settings.systemName) {
+                this.updateSystemName(settings.systemName);
+            }
+        }
+        
+        // Listen for system name changes
+        if (window.eventManager) {
+            eventManager.on('system:nameChanged', (data) => {
+                this.updateSystemName(data.systemName);
+            });
+        }
+    }
+
+    updateSystemName(systemName) {
+        const systemNameElement = this.element.querySelector('.menu-item.active');
+        if (systemNameElement) {
+            systemNameElement.textContent = systemName;
+            console.log(`✅ MenuBar: Updated system name to "${systemName}"`);
+        }
     }
 
     setupEventListeners() {
