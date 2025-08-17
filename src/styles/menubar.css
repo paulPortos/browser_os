@@ -1,17 +1,17 @@
-/* Menu Bar Styles - Modern Glass Design */
+/* Menu Bar Styles - Modern Glass Design - Responsive */
 .menubar {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 32px;
+    height: var(--menubar-height);
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(30px) saturate(1.8);
     -webkit-backdrop-filter: blur(30px) saturate(1.8);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 20px;
+    padding: 0 clamp(10px, 3vw, 20px);
     z-index: 1000;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: 0 1px 20px rgba(0, 0, 0, 0.1), 
@@ -23,11 +23,11 @@
 .menubar-right {
     display: flex;
     align-items: center;
-    gap: 24px;
+    gap: clamp(12px, 3vw, 24px);
 }
 
 .apple-logo {
-    font-size: 18px;
+    font-size: clamp(14px, 3vw, 18px);
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
@@ -41,10 +41,10 @@
 
 .menu-item {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 14px;
+    font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 500;
     cursor: pointer;
-    padding: 6px 12px;
+    padding: clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
     border-radius: 8px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     white-space: nowrap;
@@ -74,9 +74,9 @@
 
 #datetime {
     font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 13px;
+    font-size: clamp(11px, 2.2vw, 13px);
     font-weight: 600;
-    min-width: 160px;
+    min-width: clamp(120px, 20vw, 160px);
     text-align: right;
     color: rgba(255, 255, 255, 0.95);
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -85,10 +85,10 @@
 
 #wifi-status,
 #battery-status {
-    font-size: 14px;
+    font-size: clamp(12px, 2.5vw, 14px);
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: clamp(2px, 0.5vw, 4px);
     color: rgba(255, 255, 255, 0.9);
     font-weight: 500;
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
@@ -101,7 +101,7 @@
     transform: scale(1.05);
 }
 
-/* Menu Dropdown - Enhanced Glass Design */
+/* Menu Dropdown - Enhanced Glass Design - Responsive */
 .menu-dropdown {
     position: absolute;
     top: 100%;
@@ -111,8 +111,8 @@
     -webkit-backdrop-filter: blur(40px) saturate(1.8);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 12px;
-    padding: 8px 0;
-    min-width: 200px;
+    padding: clamp(4px, 1vw, 8px) 0;
+    min-width: clamp(160px, 25vw, 200px);
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2), 
                 0 8px 20px rgba(0, 0, 0, 0.15),
                 inset 0 1px 0 rgba(255, 255, 255, 0.2);
@@ -143,16 +143,16 @@
 
 .menu-dropdown-item {
     color: rgba(255, 255, 255, 0.9);
-    font-size: 14px;
+    font-size: clamp(12px, 2.5vw, 14px);
     font-weight: 500;
-    padding: 10px 18px;
+    padding: clamp(8px, 2vw, 10px) clamp(14px, 3vw, 18px);
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     align-items: center;
     justify-content: space-between;
     backdrop-filter: blur(10px);
-    margin: 2px 4px;
+    margin: clamp(1px, 0.3vw, 2px) clamp(2px, 0.8vw, 4px);
     border-radius: 8px;
     border: 1px solid transparent;
 }
@@ -171,7 +171,76 @@
         transparent 0%, 
         rgba(255, 255, 255, 0.2) 50%, 
         transparent 100%);
-    margin: 8px 12px;
+    margin: clamp(6px, 1.5vw, 8px) clamp(8px, 2vw, 12px);
+}
+
+/* Responsive Media Queries for Menubar */
+@media (max-width: 768px) {
+    .menubar {
+        padding: 0 clamp(8px, 2vw, 15px);
+    }
+    
+    .menubar-left,
+    .menubar-right {
+        gap: clamp(8px, 2vw, 16px);
+    }
+    
+    .menu-item {
+        padding: clamp(3px, 0.8vw, 5px) clamp(6px, 1.5vw, 10px);
+    }
+    
+    #datetime {
+        min-width: clamp(100px, 18vw, 140px);
+    }
+}
+
+@media (max-width: 480px) {
+    .menubar {
+        padding: 0 clamp(5px, 1.5vw, 10px);
+    }
+    
+    .menubar-left,
+    .menubar-right {
+        gap: clamp(6px, 1.5vw, 12px);
+    }
+    
+    .menu-item {
+        padding: clamp(2px, 0.5vw, 4px) clamp(4px, 1vw, 8px);
+    }
+    
+    #datetime {
+        min-width: clamp(80px, 15vw, 120px);
+    }
+    
+    .menu-dropdown {
+        min-width: clamp(140px, 22vw, 180px);
+    }
+}
+
+@media (min-width: 1200px) {
+    .menubar {
+        padding: 0 clamp(15px, 2.5vw, 25px);
+    }
+    
+    .menubar-left,
+    .menubar-right {
+        gap: clamp(20px, 2.5vw, 30px);
+    }
+}
+
+@media (min-width: 1600px) {
+    .menubar {
+        padding: 0 clamp(20px, 3vw, 35px);
+    }
+    
+    .menubar-left,
+    .menubar-right {
+        gap: clamp(24px, 3vw, 40px);
+    }
+    
+    #datetime {
+        min-width: clamp(140px, 18vw, 180px);
+    }
 }
 
 /* Dark Theme Overrides for Menu Bar */

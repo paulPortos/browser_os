@@ -21,6 +21,7 @@ class ConfigManager {
                 soundEnabled: true,
                 language: 'en',
                 timezone: 'UTC',
+                systemName: 'browseros', // The system name used in terminal prompts
                 startupApps: [],
                 lastSaved: new Date().toISOString()
             },

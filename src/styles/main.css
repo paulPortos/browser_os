@@ -1,13 +1,49 @@
-/* Root Variables for Theming */
+/* Root Variables for Theming and Responsiveness - Enhanced */
 :root {
     --bg-color: #ffffff;
     --text-color: #000000;
     --window-bg: rgba(255, 255, 255, 0.95);
     --menubar-bg: rgba(240, 240, 240, 0.9);
-    --desktop-icon-size: 80px;
+    --desktop-icon-size: clamp(60px, 8vw, 80px);
     --border-radius: 12px;
     --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     --desktop-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* Enhanced Responsive Layout Variables */
+    --menubar-height: clamp(28px, 4.5vw, 32px);
+    --dock-height: clamp(50px, 8vw, 60px);
+    --dock-icon-size: clamp(36px, 6vw, 48px);
+    --window-min-width: clamp(280px, 40vw, 400px);
+    --window-min-height: clamp(200px, 30vh, 300px);
+    --window-max-width: clamp(800px, 95vw, 1200px);
+    --window-max-height: clamp(600px, 90vh, 900px);
+    --window-header-height: clamp(28px, 4vw, 32px);
+    
+    /* Typography Variables */
+    --base-font-size: clamp(12px, 2.5vw, 14px);
+    --heading-font-size: clamp(16px, 3.5vw, 20px);
+    --small-font-size: clamp(10px, 2vw, 12px);
+    --desktop-icon-text-size: clamp(10px, 1.8vw, 12px);
+    
+    /* Spacing Variables */
+    --spacing-xs: clamp(2px, 0.5vw, 4px);
+    --spacing-sm: clamp(4px, 1vw, 8px);
+    --spacing-md: clamp(8px, 2vw, 16px);
+    --spacing-lg: clamp(16px, 3vw, 24px);
+    --spacing-xl: clamp(24px, 4vw, 32px);
+    --desktop-icon-spacing: clamp(15px, 3vw, 25px);
+    
+    /* Border Radius Variables */
+    --border-radius-sm: clamp(4px, 1vw, 6px);
+    --border-radius-md: clamp(8px, 2vw, 12px);
+    --border-radius-lg: clamp(12px, 2.5vw, 16px);
+    
+    /* Responsive Breakpoints as CSS Custom Properties */
+    --breakpoint-mobile: 480px;
+    --breakpoint-tablet: 768px;
+    --breakpoint-desktop: 1024px;
+    --breakpoint-large: 1200px;
+    --breakpoint-xlarge: 1600px;
 }
 
 /* Dark Theme Variables */
@@ -31,9 +67,11 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
     height: 100vh;
+    width: 100vw;
     background: var(--desktop-bg);
     user-select: none;
     color: var(--text-color);
+    font-size: clamp(12px, 1.5vw, 16px);
 }
 
 /* Scrollbar Styling */
@@ -313,6 +351,79 @@ body {
     min-height: 0;
 }
 
+/* Responsive Breakpoints and Media Queries */
+@media screen and (max-width: 768px) {
+    :root {
+        --desktop-icon-size: clamp(50px, 12vw, 70px);
+        --menubar-height: clamp(32px, 5vh, 40px);
+        --dock-height: clamp(50px, 10vh, 70px);
+    }
+    
+    body {
+        font-size: clamp(14px, 2vw, 18px);
+    }
+    
+    /* Stack windows on mobile */
+    .window {
+        width: 95vw !important;
+        height: 80vh !important;
+        left: 2.5vw !important;
+        top: 10vh !important;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    :root {
+        --desktop-icon-size: clamp(45px, 15vw, 60px);
+        --menubar-height: clamp(28px, 6vh, 36px);
+        --dock-height: clamp(45px, 12vh, 65px);
+    }
+    
+    /* Mobile-specific adjustments */
+    .window {
+        width: 98vw !important;
+        height: 85vh !important;
+        left: 1vw !important;
+        top: 5vh !important;
+        border-radius: 8px;
+    }
+    
+    .window-header {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    
+    .window-controls {
+        gap: 8px;
+    }
+    
+    .window-control {
+        width: 20px;
+        height: 20px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (min-width: 1200px) {
+    :root {
+        --desktop-icon-size: clamp(70px, 6vw, 90px);
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    :root {
+        --desktop-icon-size: clamp(80px, 5vw, 100px);
+    }
+}
+
+/* High DPI / Retina Displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
 /* Ensure textareas and content areas are responsive */
 textarea,
 .editor-content,
@@ -321,4 +432,57 @@ textarea,
     flex: 1;
     resize: none;
     min-height: 0;
+}
+
+/* Responsive Utility Classes */
+.responsive-hide-mobile {
+    @media (max-width: 480px) {
+        display: none !important;
+    }
+}
+
+.responsive-hide-tablet {
+    @media (max-width: 768px) {
+        display: none !important;
+    }
+}
+
+.responsive-show-mobile {
+    display: none;
+    @media (max-width: 480px) {
+        display: block !important;
+    }
+}
+
+.responsive-flex-column-mobile {
+    @media (max-width: 480px) {
+        flex-direction: column !important;
+    }
+}
+
+.responsive-full-width-mobile {
+    @media (max-width: 480px) {
+        width: 100% !important;
+    }
+}
+
+.responsive-center-mobile {
+    @media (max-width: 480px) {
+        margin: 0 auto !important;
+        text-align: center !important;
+    }
+}
+
+/* Responsive Container Utilities */
+.responsive-container {
+    width: 100%;
+    max-width: var(--window-max-width);
+    margin: 0 auto;
+    padding: 0 var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .responsive-container {
+        padding: 0 var(--spacing-sm);
+    }
 }

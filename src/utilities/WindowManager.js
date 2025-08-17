@@ -7,6 +7,7 @@ class WindowManager {
         this.zIndexCounter = 100;
         this.activeWindow = null;
         this.windowsContainer = null;
+        this.previousViewport = { width: window.innerWidth, height: window.innerHeight };
         
         this.init();
     }
@@ -14,6 +15,7 @@ class WindowManager {
     init() {
         this.windowsContainer = document.getElementById('windows-container');
         this.setupEventListeners();
+        this.setupResponsiveHandlers();
     }
 
     setupEventListeners() {
@@ -45,6 +47,111 @@ class WindowManager {
     }
 
     /**
+     * Setup responsive handlers for window management
+     */
+    setupResponsiveHandlers() {
+        // Handle window resize for responsive adjustments
+        window.addEventListener('resize', () => {
+            this.handleViewportResize();
+        });
+
+        // Handle orientation changes on mobile/tablets
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                this.handleViewportResize();
+            }, 100);
+        });
+
+        // Handle display changes (connecting/disconnecting monitors)
+        if (screen && screen.orientation) {
+            screen.orientation.addEventListener('change', () => {
+                this.handleViewportResize();
+            });
+        }
+    }
+
+    /**
+     * Handle viewport resize and adjust windows accordingly
+     */
+    handleViewportResize() {
+        const currentViewport = { width: window.innerWidth, height: window.innerHeight };
+        const scaleX = currentViewport.width / this.previousViewport.width;
+        const scaleY = currentViewport.height / this.previousViewport.height;
+
+        this.windows.forEach((windowData) => {
+            const { element, config, isMaximized, isMinimized } = windowData;
+            
+            // Skip adjustment for minimized or maximized windows
+            if (isMinimized || isMaximized) {
+                return;
+            }
+
+            // Calculate new responsive dimensions and positions
+            const newConfig = this.calculateResponsiveWindowBounds(config, scaleX, scaleY);
+            
+            // Apply responsive bounds
+            this.applyWindowBounds(element, newConfig);
+            
+            // Update stored config
+            Object.assign(config, newConfig);
+        });
+
+        this.previousViewport = currentViewport;
+    }
+
+    /**
+     * Calculate responsive window bounds based on viewport scaling
+     */
+    calculateResponsiveWindowBounds(config, scaleX, scaleY) {
+        const minWidth = Math.max(300, window.innerWidth * 0.2);
+        const minHeight = Math.max(200, window.innerHeight * 0.2);
+        const maxWidth = window.innerWidth * 0.9;
+        const maxHeight = (window.innerHeight - 100) * 0.9; // Account for menubar/dock
+
+        // Scale dimensions responsively
+        let newWidth = Math.min(maxWidth, Math.max(minWidth, config.width * scaleX));
+        let newHeight = Math.min(maxHeight, Math.max(minHeight, config.height * scaleY));
+
+        // Scale position responsively
+        let newX = Math.max(0, Math.min(window.innerWidth - newWidth, config.x * scaleX));
+        let newY = Math.max(32, Math.min(window.innerHeight - newHeight - 60, config.y * scaleY)); // Account for menubar (32px) and dock (60px)
+
+        return {
+            width: Math.round(newWidth),
+            height: Math.round(newHeight),
+            x: Math.round(newX),
+            y: Math.round(newY)
+        };
+    }
+
+    /**
+     * Apply responsive bounds to window element
+     */
+    applyWindowBounds(element, bounds) {
+        element.style.cssText = `
+            width: ${bounds.width}px;
+            height: ${bounds.height}px;
+            left: ${bounds.x}px;
+            top: ${bounds.y}px;
+            z-index: ${element.style.zIndex || this.zIndexCounter};
+        `;
+    }
+
+    /**
+     * Get responsive window position for new windows
+     */
+    getResponsiveWindowPosition(width, height) {
+        const availableWidth = window.innerWidth - width;
+        const availableHeight = window.innerHeight - height - 100; // Account for menubar/dock
+        
+        // Use viewport-relative positioning
+        const x = Math.max(0, Math.random() * availableWidth);
+        const y = Math.max(32, 32 + Math.random() * Math.max(0, availableHeight));
+        
+        return { x, y };
+    }
+
+    /**
      * Create and open a new window
      * @param {string} appId 
      * @param {string} title 
@@ -54,11 +161,16 @@ class WindowManager {
     openWindow(appId, title, content, options = {}) {
         try {
             const windowId = `window-${appId}-${Date.now()}`;
+            
+            // Calculate responsive default dimensions
+            const baseWidth = Math.min(800, window.innerWidth * 0.7);
+            const baseHeight = Math.min(600, window.innerHeight * 0.7);
+            
             const defaultOptions = {
-                width: 800,
-                height: 600,
-                x: Math.random() * (window.innerWidth - 800),
-                y: Math.random() * (window.innerHeight - 600) + 50,
+                width: baseWidth,
+                height: baseHeight,
+                x: 0,
+                y: 0,
                 resizable: true,
                 minimizable: true,
                 maximizable: true,
@@ -66,6 +178,13 @@ class WindowManager {
             };
 
             const config = { ...defaultOptions, ...options };
+            
+            // Get responsive position if not specified
+            if (config.x === 0 && config.y === 0) {
+                const position = this.getResponsiveWindowPosition(config.width, config.height);
+                config.x = position.x;
+                config.y = position.y;
+            }
 
         // Create window element
         const windowElement = document.createElement('div');

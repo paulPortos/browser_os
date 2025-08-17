@@ -1,7 +1,7 @@
-/* Dock Styles */
+/* Dock Styles - Responsive */
 .dock {
     position: fixed;
-    bottom: 8px;
+    bottom: clamp(8px, 2vh, 16px);
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
@@ -12,30 +12,38 @@
     background: rgba(255, 255, 255, 0.15);
     backdrop-filter: blur(30px);
     border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    padding: 8px 16px;
+    border-radius: clamp(16px, 3vw, 20px);
+    padding: clamp(12px, 2vw, 20px) clamp(12px, 2vw, 16px) clamp(6px, 1vw, 8px) clamp(12px, 2vw, 16px);
     display: flex;
     align-items: end;
-    gap: 8px;
+    gap: clamp(4px, 1vw, 8px);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
     pointer-events: all;
+    min-width: fit-content;
+    max-width: 95vw;
+    overflow-x: auto;
+    overflow-y: visible;
+    min-height: clamp(60px, 10vw, 80px);
 }
 
 .dock-item {
     position: relative;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    transform-origin: bottom;
+    transform-origin: bottom center;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 4px;
-    border-radius: 12px;
+    padding: clamp(2px, 0.5vw, 4px);
+    border-radius: clamp(8px, 1.5vw, 12px);
+    min-width: clamp(40px, 6vw, 56px);
+    margin-top: clamp(6px, 1.5vw, 12px);
 }
 
 .dock-item:hover {
-    transform: scale(1.4) translateY(-10px);
+    transform: scale(1.4) translateY(clamp(-8px, -2vw, -12px));
     background: rgba(255, 255, 255, 0.1);
+    z-index: 10;
 }
 
 .dock-item.bounce {
@@ -43,11 +51,11 @@
 }
 
 .dock-icon {
-    font-size: 40px;
+    font-size: clamp(28px, 5vw, 40px);
     filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.3));
     transition: all 0.3s ease;
-    width: 48px;
-    height: 48px;
+    width: clamp(36px, 6vw, 48px);
+    height: clamp(36px, 6vw, 48px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -82,23 +90,27 @@
 
 /* Dock hover effects for neighboring items */
 .dock-container:hover .dock-item:not(:hover) {
-    transform: scale(1.1);
+    transform: scale(1.05);
 }
 
 .dock-container .dock-item:hover + .dock-item {
-    transform: scale(1.2) translateY(-5px);
+    transform: scale(1.2) translateY(clamp(-4px, -1vw, -6px));
+    z-index: 5;
 }
 
 .dock-container .dock-item:hover + .dock-item + .dock-item {
-    transform: scale(1.1) translateY(-2px);
+    transform: scale(1.1) translateY(clamp(-2px, -0.5vw, -3px));
+    z-index: 3;
 }
 
 .dock-item:has(+ .dock-item:hover) {
-    transform: scale(1.2) translateY(-5px);
+    transform: scale(1.2) translateY(clamp(-4px, -1vw, -6px));
+    z-index: 5;
 }
 
 .dock-item:has(+ .dock-item + .dock-item:hover) {
-    transform: scale(1.1) translateY(-2px);
+    transform: scale(1.1) translateY(clamp(-2px, -0.5vw, -3px));
+    z-index: 3;
 }
 
 /* Tooltip for dock items */
@@ -131,5 +143,50 @@
 @supports (backdrop-filter: blur()) {
     .dock-container {
         backdrop-filter: blur(30px) saturate(180%);
+    }
+}
+
+/* Responsive Dock Adjustments */
+@media (max-width: 768px) {
+    .dock-container {
+        padding: clamp(10px, 2vw, 16px) clamp(10px, 2vw, 14px) clamp(6px, 1vw, 8px) clamp(10px, 2vw, 14px);
+        min-height: clamp(55px, 9vw, 70px);
+    }
+    
+    .dock-item {
+        margin-top: clamp(4px, 1vw, 8px);
+    }
+    
+    .dock-item:hover {
+        transform: scale(1.3) translateY(clamp(-6px, -1.5vw, -10px));
+    }
+    
+    .dock-container .dock-item:hover + .dock-item {
+        transform: scale(1.15) translateY(clamp(-3px, -0.8vw, -5px));
+    }
+}
+
+@media (max-width: 480px) {
+    .dock-container {
+        padding: clamp(8px, 2vw, 12px) clamp(8px, 2vw, 12px) clamp(4px, 1vw, 6px) clamp(8px, 2vw, 12px);
+        min-height: clamp(50px, 8vw, 65px);
+        gap: clamp(3px, 0.8vw, 6px);
+    }
+    
+    .dock-item {
+        margin-top: clamp(3px, 0.8vw, 6px);
+        min-width: clamp(35px, 5vw, 50px);
+    }
+    
+    .dock-item:hover {
+        transform: scale(1.25) translateY(clamp(-5px, -1.2vw, -8px));
+    }
+    
+    .dock-container .dock-item:hover + .dock-item {
+        transform: scale(1.1) translateY(clamp(-2px, -0.5vw, -4px));
+    }
+    
+    .dock-container .dock-item:hover + .dock-item + .dock-item {
+        transform: scale(1.05) translateY(clamp(-1px, -0.3vw, -2px));
     }
 }

@@ -48,6 +48,24 @@ class TerminalApp {
         return windowId;
     }
 
+    /**
+     * Get the current system name from configuration
+     */
+    getSystemName() {
+        if (window.configManager) {
+            return window.configManager.get('system.systemName') || 'browseros';
+        }
+        return 'browseros';
+    }
+
+    /**
+     * Generate the terminal prompt dynamically
+     */
+    generatePrompt(directory = '~') {
+        const systemName = this.getSystemName();
+        return `user@${systemName}:${directory}$ `;
+    }
+
     createTerminalContent() {
         return `
             <div class="terminal-window">
@@ -68,7 +86,7 @@ class TerminalApp {
                 </div>
                 
                 <div class="terminal-input-line">
-                    <span class="terminal-prompt">user@browseros:~$ </span>
+                    <span class="terminal-prompt" id="current-prompt">${this.generatePrompt()}</span>
                     <input type="text" class="terminal-input" id="terminal-input" autofocus>
                 </div>
             </div>
@@ -305,7 +323,7 @@ class TerminalApp {
 
     executeCommand(windowId, command) {
         const windowData = this.windows.get(windowId);
-        const prompt = `user@browseros:${windowData.currentDirectory}$ `;
+        const prompt = this.generatePrompt(windowData.currentDirectory);
         
         // Add command to output
         this.addCommandLine(windowId, prompt, command);
@@ -375,6 +393,12 @@ class TerminalApp {
                 break;
             case 'top':
                 this.commandTop(windowId, args);
+                break;
+            case 'hostname':
+                this.commandHostname(windowId, args);
+                break;
+            case 'setsystemname':
+                this.commandSetSystemName(windowId, args);
                 break;
             case 'exit':
             case 'quit':
@@ -488,6 +512,8 @@ Available commands:
   date         - Show current date and time
   whoami       - Display current user
   uname        - System information
+  hostname     - Display system name
+  setsystemname - Set system name (hostname <name>)
   clear        - Clear terminal
   history      - Show command history
   cat          - Display file contents
@@ -704,7 +730,7 @@ PID   COMMAND      %CPU TIME     #TH  #WQ  #PORT MEM    PURG
         const promptElement = windowElement.querySelector('.terminal-prompt');
         
         if (promptElement) {
-            promptElement.textContent = `user@browseros:${windowData.currentDirectory}$ `;
+            promptElement.textContent = this.generatePrompt(windowData.currentDirectory);
         }
     }
 
@@ -732,6 +758,53 @@ PID   COMMAND      %CPU TIME     #TH  #WQ  #PORT MEM    PURG
         if (input) {
             // Ensure input remains focused and properly sized
             input.style.width = '100%';
+        }
+    }
+
+    /**
+     * Show current hostname/system name
+     */
+    commandHostname(windowId, args) {
+        const systemName = this.getSystemName();
+        this.addOutput(windowId, systemName, 'output-text');
+    }
+
+    /**
+     * Set the system name (hostname)
+     */
+    commandSetSystemName(windowId, args) {
+        if (args.length < 2) {
+            this.addOutput(windowId, 'Usage: setsystemname <new_name>', 'output-error');
+            this.addOutput(windowId, 'Example: setsystemname mycomputer', 'output-text');
+            return;
+        }
+
+        const newSystemName = args[1];
+        
+        // Validate system name (only alphanumeric characters and hyphens)
+        if (!/^[a-zA-Z0-9-]+$/.test(newSystemName)) {
+            this.addOutput(windowId, 'Error: System name can only contain letters, numbers, and hyphens', 'output-error');
+            return;
+        }
+
+        // Update the configuration
+        if (window.configManager) {
+            window.configManager.set('system.systemName', newSystemName);
+            this.addOutput(windowId, `System name changed to: ${newSystemName}`, 'output-success');
+            
+            // Update all open terminal prompts
+            this.updateAllTerminalPrompts();
+        } else {
+            this.addOutput(windowId, 'Error: Configuration manager not available', 'output-error');
+        }
+    }
+
+    /**
+     * Update prompts in all open terminal windows
+     */
+    updateAllTerminalPrompts() {
+        for (const [windowId, windowData] of this.windows) {
+            this.updatePrompt(windowId);
         }
     }
 }
