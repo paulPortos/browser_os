@@ -400,6 +400,16 @@ class TerminalApp {
             case 'setsystemname':
                 this.commandSetSystemName(windowId, args);
                 break;
+            case 'restart':
+                this.commandRestart(windowId, args);
+                break;
+            case 'apps':
+            case 'applications':
+                this.commandListApplications(windowId, args);
+                break;
+            case 'pull':
+                this.commandPull(windowId, args);
+                break;
             case 'exit':
             case 'quit':
                 windowManager.closeWindow(windowManager.getWindow(windowId).id);
@@ -444,7 +454,8 @@ class TerminalApp {
         const commands = [
             'help', 'ls', 'dir', 'cd', 'pwd', 'echo', 'date', 'whoami', 'uname',
             'clear', 'history', 'cat', 'touch', 'mkdir', 'rm', 'cp', 'mv',
-            'grep', 'find', 'ps', 'top', 'exit', 'quit'
+            'grep', 'find', 'ps', 'top', 'hostname', 'setsystemname', 'restart', 
+            'apps', 'applications', 'exit', 'quit'
         ];
         
         const matches = commands.filter(cmd => cmd.startsWith(input.toLowerCase()));
@@ -514,12 +525,15 @@ Available commands:
   uname        - System information
   hostname     - Display system name
   setsystemname - Set system name (hostname <name>)
+  restart      - Restart the system
+  apps         - List all installed applications
+  pull         - Download and install applications
   clear        - Clear terminal
   history      - Show command history
   cat          - Display file contents
   touch        - Create empty file
   mkdir        - Create directory
-  rm           - Remove files/directories
+  rm           - Remove files/directories or applications
   cp           - Copy files
   mv           - Move/rename files
   grep         - Search text patterns
@@ -649,7 +663,140 @@ Available commands:
         }
         
         const target = args[1];
+        
+        // Get all available applications by checking what's currently in the DOM
+        const availableApps = this.getAvailableApplications();
+        const essentialApps = ['finder', 'terminal', 'settings', 'browser', 'trash'];
+        
+        // Normalize the target name for comparison
+        const normalizedTarget = this.normalizeAppName(target);
+        
+        // Check if the target is an application
+        if (availableApps.includes(normalizedTarget)) {
+            // Check if it's an essential app that can't be removed
+            if (essentialApps.includes(normalizedTarget)) {
+                this.addOutput(windowId, `rm: cannot remove '${target}': System-critical applications cannot be removed`, 'output-error');
+                return;
+            }
+            
+            // Remove the application
+            this.removeApplication(normalizedTarget);
+            this.addOutput(windowId, `Application '${target}' removed from system`, 'output-success');
+            return;
+        }
+        
+        // Check if user might have meant an application but used wrong name
+        const suggestions = this.findSimilarApplications(normalizedTarget, availableApps);
+        if (suggestions.length > 0) {
+            this.addOutput(windowId, `rm: cannot remove '${target}': No such application`, 'output-error');
+            this.addOutput(windowId, `Did you mean: ${suggestions.join(', ')}?`, 'output-info');
+            return;
+        }
+        
+        // Default file/directory removal
         this.addOutput(windowId, `Removed '${target}'`, 'output-success');
+    }
+
+    /**
+     * Get all available applications from the DOM
+     */
+    getAvailableApplications() {
+        const apps = [];
+        
+        // Get apps from desktop icons
+        const desktopIcons = document.querySelectorAll('.desktop-icon[data-app]');
+        desktopIcons.forEach(icon => {
+            const appId = icon.getAttribute('data-app');
+            if (appId && !apps.includes(appId)) {
+                apps.push(appId);
+            }
+        });
+        
+        // Get apps from dock items
+        const dockItems = document.querySelectorAll('.dock-item[data-app]');
+        dockItems.forEach(item => {
+            const appId = item.getAttribute('data-app');
+            if (appId && !apps.includes(appId)) {
+                apps.push(appId);
+            }
+        });
+        
+        return apps;
+    }
+
+    /**
+     * Normalize application name for comparison
+     */
+    normalizeAppName(name) {
+        return name.toLowerCase()
+                  .replace(/\s+/g, '-')
+                  .replace('textedit', 'text-editor')  // Handle common variations
+                  .replace('texteditor', 'text-editor')
+                  .replace('calc', 'calculator')
+                  .replace('cal', 'calendar');
+    }
+
+    /**
+     * Find similar application names for suggestions
+     */
+    findSimilarApplications(target, availableApps) {
+        const suggestions = [];
+        const removableApps = availableApps.filter(app => 
+            !['finder', 'terminal', 'settings', 'browser', 'trash'].includes(app)
+        );
+        
+        // Look for partial matches
+        for (const app of removableApps) {
+            if (app.includes(target) || target.includes(app.replace('-', ''))) {
+                suggestions.push(app);
+            }
+        }
+        
+        // If no partial matches, suggest all removable apps
+        if (suggestions.length === 0 && target.length > 2) {
+            return removableApps.slice(0, 3); // Limit to 3 suggestions
+        }
+        
+        return suggestions;
+    }
+
+    /**
+     * Remove application from desktop and dock
+     */
+    removeApplication(appName) {
+        // Normalize app name
+        const normalizedName = appName.toLowerCase().replace(/\s+/g, '-');
+        
+        // Remove from desktop
+        const desktopIcon = document.querySelector(`.desktop-icon[data-app="${normalizedName}"]`);
+        if (desktopIcon) {
+            desktopIcon.remove();
+        }
+        
+        // Remove from dock
+        const dockItem = document.querySelector(`.dock-item[data-app="${normalizedName}"]`);
+        if (dockItem) {
+            dockItem.remove();
+        }
+        
+        // Close any open windows of this application
+        if (windowManager && windowManager.windows) {
+            const windowsToClose = [];
+            windowManager.windows.forEach((windowData, windowId) => {
+                if (windowData.appId === normalizedName) {
+                    windowsToClose.push(windowId);
+                }
+            });
+            
+            windowsToClose.forEach(windowId => {
+                windowManager.closeWindow(windowId);
+            });
+        }
+        
+        // Emit event to notify system of application removal
+        if (eventManager) {
+            eventManager.emit('app:removed', { appId: normalizedName });
+        }
     }
 
     commandCp(windowId, args) {
@@ -806,6 +953,339 @@ PID   COMMAND      %CPU TIME     #TH  #WQ  #PORT MEM    PURG
         for (const [windowId, windowData] of this.windows) {
             this.updatePrompt(windowId);
         }
+    }
+
+    /**
+     * Restart the system
+     */
+    commandRestart(windowId, args) {
+        this.addOutput(windowId, 'Initiating system restart...', 'output-warning');
+        
+        // Create restart overlay
+        setTimeout(() => {
+            this.showRestartScreen();
+        }, 1000);
+    }
+
+    /**
+     * List all installed applications
+     */
+    commandListApplications(windowId, args) {
+        const availableApps = this.getAvailableApplications();
+        const essentialApps = ['finder', 'terminal', 'settings', 'browser', 'trash'];
+        
+        if (availableApps.length === 0) {
+            this.addOutput(windowId, 'No applications found', 'output-warning');
+            return;
+        }
+        
+        this.addOutput(windowId, 'Installed Applications:', 'output-info');
+        this.addOutput(windowId, '========================', 'output-info');
+        
+        // Get application titles from DOM
+        const appDetails = availableApps.map(appId => {
+            const dockItem = document.querySelector(`.dock-item[data-app="${appId}"]`);
+            const title = dockItem ? dockItem.getAttribute('title') : appId;
+            const isEssential = essentialApps.includes(appId);
+            
+            return {
+                id: appId,
+                title: title || appId,
+                essential: isEssential
+            };
+        }).sort((a, b) => a.title.localeCompare(b.title));
+        
+        // Display applications
+        appDetails.forEach(app => {
+            const status = app.essential ? '[SYSTEM]' : '[REMOVABLE]';
+            const statusClass = app.essential ? 'output-warning' : 'output-success';
+            
+            this.addOutput(windowId, `${app.title.padEnd(15)} ${status}`, statusClass);
+        });
+        
+        this.addOutput(windowId, '', 'output-text');
+        this.addOutput(windowId, `Total: ${availableApps.length} applications`, 'output-info');
+        this.addOutput(windowId, 'Use "rm <app-id>" to remove non-system applications', 'output-muted');
+    }
+
+    /**
+     * Pull (download/install) applications
+     */
+    commandPull(windowId, args) {
+        if (args.length < 2) {
+            this.addOutput(windowId, 'Usage: pull <application_name>', 'output-error');
+            this.addOutput(windowId, 'Example: pull calculator', 'output-muted');
+            return;
+        }
+        
+        const targetApp = args[1];
+        const normalizedTarget = this.normalizeAppName(targetApp);
+        
+        // Debug: Show what we're looking for and what we found
+        const currentApps = this.getAvailableApplications();
+        this.addOutput(windowId, `Debug: Looking for '${normalizedTarget}'`, 'output-info');
+        this.addOutput(windowId, `Debug: Currently installed: [${currentApps.join(', ')}]`, 'output-info');
+        
+        // First check if application is already installed
+        if (currentApps.includes(normalizedTarget)) {
+            this.addOutput(windowId, `Application '${targetApp}' is already installed`, 'output-warning');
+            return;
+        }
+        
+        // Then check if application exists in applications folder
+        const availableForDownload = this.getAvailableForDownload();
+        
+        if (!availableForDownload.includes(normalizedTarget)) {
+            this.addOutput(windowId, `pull: application '${targetApp}' not found in repository`, 'output-error');
+            
+            // Suggest available applications
+            if (availableForDownload.length > 0) {
+                this.addOutput(windowId, `Available applications: ${availableForDownload.join(', ')}`, 'output-info');
+            }
+            return;
+        }
+        
+        // Start the installation process
+        this.installApplication(windowId, normalizedTarget, targetApp);
+    }
+
+    /**
+     * Get applications available for download (check applications folder)
+     */
+    getAvailableForDownload() {
+        // These are the applications that exist in the src/applications folder
+        // but might not be on the desktop/dock yet
+        const allPossibleApps = [
+            'calculator',
+            'text-editor', 
+            'calendar',
+            'browser',
+            'settings',
+            'finder'
+        ];
+        
+        return allPossibleApps;
+    }
+
+    /**
+     * Install application with progress animation
+     */
+    async installApplication(windowId, appId, originalName) {
+        const windowElement = windowManager.getWindow(windowId).element;
+        const input = windowElement.querySelector('#terminal-input');
+        
+        // Disable input during installation
+        input.disabled = true;
+        
+        this.addOutput(windowId, `Initializing download for '${originalName}'...`, 'output-info');
+        
+        // Create progress line
+        const output = windowElement.querySelector('#terminal-output');
+        const progressLine = document.createElement('div');
+        progressLine.className = 'command-output output-success';
+        progressLine.innerHTML = `Installing: [<span id="progress-dots-${windowId}">.</span>] <span id="progress-percent-${windowId}">0%</span>`;
+        output.appendChild(progressLine);
+        this.scrollToBottom(windowId);
+        
+        // Animate progress
+        let progress = 0;
+        const maxDots = 10;
+        
+        const progressInterval = setInterval(() => {
+            progress += Math.random() * 15 + 5; // Random progress increment
+            if (progress > 100) progress = 100;
+            
+            const dotsCount = Math.floor((progress / 100) * maxDots);
+            const dots = '●'.repeat(dotsCount) + '.'.repeat(maxDots - dotsCount);
+            
+            const dotsElement = document.getElementById(`progress-dots-${windowId}`);
+            const percentElement = document.getElementById(`progress-percent-${windowId}`);
+            
+            if (dotsElement && percentElement) {
+                dotsElement.textContent = dots;
+                percentElement.textContent = Math.floor(progress) + '%';
+            }
+            
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                
+                // Installation complete
+                setTimeout(() => {
+                    this.addOutput(windowId, `Download successful! Installing '${originalName}'...`, 'output-success');
+                    
+                    setTimeout(() => {
+                        // Add application to desktop
+                        this.addApplicationToDesktop(appId, originalName);
+                        this.addOutput(windowId, `Application '${originalName}' installed successfully`, 'output-success');
+                        
+                        // Re-enable input
+                        input.disabled = false;
+                        input.focus();
+                    }, 1000);
+                }, 500);
+            }
+        }, 200); // Update every 200ms
+    }
+
+    /**
+     * Add application to desktop
+     */
+    addApplicationToDesktop(appId, displayName) {
+        const desktopContent = document.getElementById('desktop-content');
+        if (!desktopContent) return;
+        
+        // Check if already exists
+        const existingIcon = document.querySelector(`.desktop-icon[data-app="${appId}"]`);
+        if (existingIcon) return;
+        
+        // Get application info
+        const appInfo = this.getApplicationInfo(appId);
+        
+        // Create desktop icon
+        const desktopIcon = document.createElement('div');
+        desktopIcon.className = 'desktop-icon';
+        desktopIcon.setAttribute('data-app', appId);
+        desktopIcon.innerHTML = `
+            <div class="icon">${appInfo.icon}</div>
+            <div class="label">${appInfo.label}</div>
+        `;
+        
+        // Add to desktop
+        desktopContent.appendChild(desktopIcon);
+        
+        // Add to dock if not exists
+        this.addApplicationToDock(appId, appInfo);
+        
+        // Add click handler
+        desktopIcon.addEventListener('click', () => {
+            eventManager.emit('app:launch', { appId: appId });
+        });
+        
+        // Add installed animation
+        desktopIcon.style.opacity = '0';
+        desktopIcon.style.transform = 'scale(0.5)';
+        desktopIcon.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        
+        setTimeout(() => {
+            desktopIcon.style.opacity = '1';
+            desktopIcon.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    /**
+     * Add application to dock
+     */
+    addApplicationToDock(appId, appInfo) {
+        const dockContainer = document.querySelector('.dock-container');
+        if (!dockContainer) return;
+        
+        // Check if already exists
+        const existingDockItem = document.querySelector(`.dock-item[data-app="${appId}"]`);
+        if (existingDockItem) return;
+        
+        // Find insertion point (before trash)
+        const trashItem = document.querySelector('.dock-item.trash');
+        
+        const dockItem = document.createElement('div');
+        dockItem.className = 'dock-item';
+        dockItem.setAttribute('data-app', appId);
+        dockItem.setAttribute('title', appInfo.label);
+        dockItem.innerHTML = `
+            <div class="dock-icon">${appInfo.icon}</div>
+            <div class="dock-indicator"></div>
+        `;
+        
+        // Insert before trash or at the end
+        if (trashItem) {
+            dockContainer.insertBefore(dockItem, trashItem);
+        } else {
+            dockContainer.appendChild(dockItem);
+        }
+        
+        // Add click handler
+        dockItem.addEventListener('click', () => {
+            eventManager.emit('app:launch', { appId: appId });
+        });
+    }
+
+    /**
+     * Get application information (icon and label)
+     */
+    getApplicationInfo(appId) {
+        const appInfoMap = {
+            'calculator': { icon: '🧮', label: 'Calculator' },
+            'text-editor': { icon: '📝', label: 'TextEdit' },
+            'calendar': { icon: '📅', label: 'Calendar' },
+            'browser': { icon: '🌐', label: 'Browser' },
+            'settings': { icon: '⚙️', label: 'Settings' },
+            'finder': { icon: '📁', label: 'Finder' }
+        };
+        
+        return appInfoMap[appId] || { icon: '📱', label: appId };
+    }
+
+    /**
+     * Show restart screen with loading animation
+     */
+    showRestartScreen() {
+        // Create full-screen overlay
+        const restartOverlay = document.createElement('div');
+        restartOverlay.id = 'restart-overlay';
+        restartOverlay.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 24px;
+        `;
+
+        // Add restart content
+        restartOverlay.innerHTML = `
+            <div style="text-align: center; animation: fadeIn 0.5s ease-in;">
+                <div style="font-size: 48px; margin-bottom: 20px;">🔄</div>
+                <div style="margin-bottom: 20px;">Restarting System...</div>
+                <div style="width: 200px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; overflow: hidden;">
+                    <div id="restart-progress" style="width: 0%; height: 100%; background: #4CAF50; transition: width 0.1s ease;"></div>
+                </div>
+                <div style="margin-top: 10px; font-size: 14px; opacity: 0.7;">Please wait...</div>
+            </div>
+            
+            <style>
+                @keyframes fadeIn {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+            </style>
+        `;
+
+        document.body.appendChild(restartOverlay);
+
+        // Animate progress bar
+        const progressBar = document.getElementById('restart-progress');
+        let progress = 0;
+        
+        const progressInterval = setInterval(() => {
+            progress += 2;
+            progressBar.style.width = progress + '%';
+            
+            if (progress >= 100) {
+                clearInterval(progressInterval);
+                
+                // Wait a moment then reload
+                setTimeout(() => {
+                    window.location.reload();
+                }, 500);
+            }
+        }, 100); // 5 seconds total (50 * 100ms = 5000ms)
     }
 }
 
