@@ -527,6 +527,8 @@ class WindowManager {
         if (!this.windows.has(windowId)) return;
 
         const windowData = this.windows.get(windowId);
+        // Remove fade-in to prevent animation conflict that causes blinking
+        windowData.element.classList.remove('fade-in');
         windowData.element.classList.add('scale-out');
         
         setTimeout(() => {

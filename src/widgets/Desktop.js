@@ -566,20 +566,24 @@ class Desktop {
 
     cleanUpDesktop() {
         const icons = Array.from(this.desktopContent.querySelectorAll('.desktop-icon'));
-        const gridSize = 100;
-        let col = 0;
-        let row = 0;
+        const padding = 20;
+        const iconWidth = 80;
+        const iconHeight = 100;
+        const gapX = 20;
+        const gapY = 20;
+        const containerWidth = this.desktopContent.offsetWidth;
+        const maxCols = Math.max(1, Math.floor((containerWidth - padding) / (iconWidth + gapX)));
         
-        icons.forEach(icon => {
-            icon.style.position = 'absolute';
-            icon.style.left = `${col * gridSize}px`;
-            icon.style.top = `${row * gridSize}px`;
+        icons.forEach((icon, index) => {
+            const col = index % maxCols;
+            const row = Math.floor(index / maxCols);
             
-            col++;
-            if (col * gridSize + 80 > this.desktopContent.offsetWidth) {
-                col = 0;
-                row++;
-            }
+            // Reset any drag state
+            icon.classList.remove('dragged', 'dragging');
+            icon.style.position = 'absolute';
+            icon.style.transform = '';
+            icon.style.left = `${padding + col * (iconWidth + gapX)}px`;
+            icon.style.top = `${padding + row * (iconHeight + gapY)}px`;
         });
         
         SystemUtils.showNotification('Desktop', 'Desktop cleaned up');
@@ -606,20 +610,24 @@ class Desktop {
         });
         
         // Re-position icons
-        const gridSize = 100;
-        let col = 0;
-        let row = 0;
+        const padding = 20;
+        const iconWidth = 80;
+        const iconHeight = 100;
+        const gapX = 20;
+        const gapY = 20;
+        const containerWidth = this.desktopContent.offsetWidth;
+        const maxCols = Math.max(1, Math.floor((containerWidth - padding) / (iconWidth + gapX)));
         
-        icons.forEach(icon => {
-            icon.style.position = 'absolute';
-            icon.style.left = `${col * gridSize}px`;
-            icon.style.top = `${row * gridSize}px`;
+        icons.forEach((icon, index) => {
+            const col = index % maxCols;
+            const row = Math.floor(index / maxCols);
             
-            col++;
-            if (col * gridSize + 80 > this.desktopContent.offsetWidth) {
-                col = 0;
-                row++;
-            }
+            // Reset any drag state
+            icon.classList.remove('dragged', 'dragging');
+            icon.style.position = 'absolute';
+            icon.style.transform = '';
+            icon.style.left = `${padding + col * (iconWidth + gapX)}px`;
+            icon.style.top = `${padding + row * (iconHeight + gapY)}px`;
         });
         
         SystemUtils.showNotification('Desktop', `Icons sorted by ${criteria}`);

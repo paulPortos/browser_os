@@ -108,7 +108,7 @@ body {
 }
 
 .scale-out {
-    animation: scaleOut 0.2s ease-in;
+    animation: scaleOut 0.2s ease-in forwards;
 }
 
 .bounce {
