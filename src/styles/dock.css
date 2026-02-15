@@ -217,3 +217,73 @@
         transform: scale(1.02) translateY(clamp(-1px, -0.3vw, -2px));
     }
 }
+
+/* ============================================================
+   Dock Auto-hide
+============================================================ */
+.dock.dock-autohide {
+    transition: transform 0.35s ease, opacity 0.35s ease;
+    transform: translateX(-50%) translateY(100%);
+    opacity: 0;
+}
+.dock.dock-autohide:hover,
+.dock.dock-autohide.dock-peek {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* ============================================================
+   Dock Positioning (Left / Right)
+============================================================ */
+.dock.dock-left {
+    bottom: auto;
+    left: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.dock.dock-left .dock-container {
+    flex-direction: column;
+    min-width: auto;
+    max-width: none;
+    max-height: 90vh;
+    min-height: auto;
+    height: auto;
+}
+.dock.dock-left .dock-item:hover {
+    transform: scale(1.25) translateX(12px);
+}
+
+.dock.dock-right {
+    bottom: auto;
+    left: auto;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.dock.dock-right .dock-container {
+    flex-direction: column;
+    min-width: auto;
+    max-width: none;
+    max-height: 90vh;
+    min-height: auto;
+    height: auto;
+}
+.dock.dock-right .dock-item:hover {
+    transform: scale(1.25) translateX(-12px);
+}
+
+/* Auto-hide overrides for side docks */
+.dock.dock-left.dock-autohide {
+    transform: translateY(-50%) translateX(-100%);
+}
+.dock.dock-left.dock-autohide:hover,
+.dock.dock-left.dock-autohide.dock-peek {
+    transform: translateY(-50%) translateX(0);
+}
+.dock.dock-right.dock-autohide {
+    transform: translateY(-50%) translateX(100%);
+}
+.dock.dock-right.dock-autohide:hover,
+.dock.dock-right.dock-autohide.dock-peek {
+    transform: translateY(-50%) translateX(0);
+}

@@ -15,7 +15,8 @@ class EnvConfig {
         // In a real browser deployment, these would be set during build process
         // For development, you can modify these values directly
         this.config = {
-            DEVELOPMENT_EMAIL: 'developer@yourdomain.com', // UPDATE THIS!
+            DEV_EMAIL: 'developer@yourdomain.com', // UPDATE THIS!
+            DEVELOPMENT_EMAIL: 'developer@yourdomain.com', // legacy alias
             EMAILJS_SERVICE_ID: 'your_service_id',
             EMAILJS_TEMPLATE_ID: 'your_template_id',
             EMAILJS_PUBLIC_KEY: 'your_public_key',

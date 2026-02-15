@@ -261,8 +261,41 @@ class Desktop {
     handleIconDoubleClick(icon) {
         const appId = icon.dataset.app;
         const appTitle = icon.querySelector('.label').textContent;
-        
+
+        // If it's a folder, open it in Finder navigated to its path
+        if (appId === 'folder') {
+            const folderName = appTitle;
+            // Ensure folder exists in filesystem
+            this.syncDesktopFolderToFS(folderName);
+            eventManager.emit('app:launch', {
+                appId: 'finder',
+                title: 'Finder',
+                openPath: `/Desktop/${folderName}`
+            });
+            return;
+        }
+
         this.launchApplication(appId, appTitle);
+    }
+
+    /**
+     * Sync a desktop folder to the virtual filesystem so Finder can show it
+     */
+    syncDesktopFolderToFS(folderName) {
+        if (typeof configManager === 'undefined') return;
+        const desktopFolder = configManager.getFile('/Desktop');
+        if (!desktopFolder) return;
+        if (!desktopFolder.children) desktopFolder.children = {};
+        if (!desktopFolder.children[folderName]) {
+            desktopFolder.children[folderName] = {
+                type: 'folder',
+                name: folderName,
+                children: {},
+                created: new Date().toISOString(),
+                modified: new Date().toISOString()
+            };
+            configManager.saveConfig();
+        }
     }
 
     selectIcon(icon) {
@@ -437,6 +470,7 @@ class Desktop {
     renameIcon(icon) {
         const currentName = icon.querySelector('.label').textContent;
         const labelElement = icon.querySelector('.label');
+        const appId = icon.dataset.app;
         
         // Create input field
         const input = document.createElement('input');
@@ -464,6 +498,23 @@ class Desktop {
             input.replaceWith(newLabel);
             
             if (newName !== currentName) {
+                // Sync rename to filesystem for folders
+                if (appId === 'folder' && typeof configManager !== 'undefined') {
+                    const desktopFolder = configManager.getFile('/Desktop');
+                    if (desktopFolder && desktopFolder.children) {
+                        if (desktopFolder.children[currentName]) {
+                            const data = desktopFolder.children[currentName];
+                            data.name = newName;
+                            data.modified = new Date().toISOString();
+                            desktopFolder.children[newName] = data;
+                            delete desktopFolder.children[currentName];
+                            configManager.saveConfig();
+                        } else {
+                            // Folder doesn't exist yet, create it
+                            this.syncDesktopFolderToFS(newName);
+                        }
+                    }
+                }
                 SystemUtils.showNotification('Desktop', `Renamed to "${newName}"`);
             }
         };
@@ -496,22 +547,38 @@ class Desktop {
     }
 
     createNewFolder() {
+        // Find a unique name
+        let baseName = 'New Folder';
+        let finalName = baseName;
+        let counter = 1;
+        const existingNames = new Set();
+        this.desktopContent.querySelectorAll('.desktop-icon').forEach(ic => {
+            const lbl = ic.querySelector('.label');
+            if (lbl) existingNames.add(lbl.textContent);
+        });
+        while (existingNames.has(finalName)) {
+            finalName = `${baseName} ${counter++}`;
+        }
+
         const folder = SystemUtils.createElement('div', 'desktop-icon scale-in', {
             'data-app': 'folder',
             innerHTML: `
                 <div class="icon">📁</div>
-                <div class="label">New Folder</div>
+                <div class="label">${finalName}</div>
             `
         });
-        
+
         const position = this.getNextAvailablePosition();
         folder.style.position = 'absolute';
         folder.style.left = `${position.x}px`;
         folder.style.top = `${position.y}px`;
-        
+
         this.desktopContent.appendChild(folder);
         this.setupIconInteractions(folder);
-        
+
+        // Sync to virtual filesystem
+        this.syncDesktopFolderToFS(finalName);
+
         // Auto-rename
         setTimeout(() => this.renameIcon(folder), 100);
     }
@@ -547,21 +614,75 @@ class Desktop {
     }
 
     changeDesktopBackground() {
-        const backgrounds = [
-            'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-            'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-            'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-            'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-            'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-            'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)'
-        ];
-        
-        const currentBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-        this.element.style.background = currentBg;
-        
-        SystemUtils.showNotification('Desktop', 'Desktop background changed');
+        // Show a picker with free web images from picsum.photos (no storing)
+        const seed = Date.now();
+        const thumbnails = [];
+        for (let i = 0; i < 8; i++) {
+            thumbnails.push({
+                thumb: `https://picsum.photos/seed/${seed + i}/200/120`,
+                full: `https://picsum.photos/seed/${seed + i}/1920/1080`
+            });
+        }
+
+        const grid = thumbnails.map((t, i) => `
+            <div class="bg-thumb" data-index="${i}" style="cursor:pointer;border-radius:8px;overflow:hidden;border:3px solid transparent;transition:border-color 0.2s;">
+                <img src="${t.thumb}" alt="Background ${i+1}" style="width:100%;height:100%;object-fit:cover;display:block;" crossorigin="anonymous">
+            </div>
+        `).join('');
+
+        SystemUtils.showModal(
+            'Choose Desktop Background',
+            `
+                <p style="margin-bottom:12px;color:#666;font-size:13px;">Select a background from free web images. Images are loaded directly and never stored.</p>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+                    ${grid}
+                </div>
+                <div style="margin-top:12px;text-align:center;">
+                    <button id="bg-refresh-btn" style="padding:6px 16px;border:1px solid #ccc;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;">🔄 Load More</button>
+                </div>
+            `,
+            [
+                { text: 'Cancel', value: 'cancel' },
+                { text: 'Apply', primary: true, value: 'apply' }
+            ]
+        ).then(result => {
+            if (result === 'apply' && this._selectedBgUrl) {
+                this.element.style.background = `url('${this._selectedBgUrl}') center/cover no-repeat`;
+                SystemUtils.showNotification('Desktop', 'Desktop background changed');
+            }
+            this._selectedBgUrl = null;
+        });
+
+        // Attach selection logic after modal is rendered
+        setTimeout(() => {
+            this._selectedBgUrl = null;
+            const thumbEls = document.querySelectorAll('.bg-thumb');
+            thumbEls.forEach(el => {
+                el.addEventListener('click', () => {
+                    thumbEls.forEach(t => t.style.borderColor = 'transparent');
+                    el.style.borderColor = '#007AFF';
+                    const idx = parseInt(el.dataset.index);
+                    this._selectedBgUrl = thumbnails[idx].full;
+                });
+            });
+
+            // Refresh button
+            const refreshBtn = document.getElementById('bg-refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', () => {
+                    const newSeed = Date.now();
+                    thumbEls.forEach((el, i) => {
+                        const newThumb = `https://picsum.photos/seed/${newSeed + i}/200/120`;
+                        const newFull = `https://picsum.photos/seed/${newSeed + i}/1920/1080`;
+                        thumbnails[i] = { thumb: newThumb, full: newFull };
+                        const img = el.querySelector('img');
+                        if (img) img.src = newThumb;
+                        el.style.borderColor = 'transparent';
+                    });
+                    this._selectedBgUrl = null;
+                });
+            }
+        }, 100);
     }
 
     cleanUpDesktop() {
